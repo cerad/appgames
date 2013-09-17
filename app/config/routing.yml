@@ -1,0 +1,4 @@
+cerad_game:
+    resource: "@CeradGameBundle/Resources/config/routing.yml"
+    prefix:   /
+
