@@ -5,3 +5,7 @@ services:
 #    cerad_game.example:
 #        class: %cerad_game.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
+
+    cerad_game.schedule_GamesWithSlots.import:
+        class: Cerad\Bundle\GameBundle\Schedule\Import\GamesWithSlotsImport
+        
