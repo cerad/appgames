@@ -6,6 +6,20 @@ services:
 #        class: %cerad_game.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
 
+    cerad_project.entity_manager.doctrine:
+        alias: doctrine.orm.default_entity_manager
+
+    cerad_project.project_repository.doctrine:
+        class:  Cerad\Bundle\GameBundle\Entity\ProjectRepository
+        factory_service: 'cerad_project.entity_manager.doctrine'
+        factory_method:  'getRepository'
+        arguments:  
+            - 'Cerad\Bundle\GameBundle\Entity\Project'
+            
+    cerad_project.project_repository:
+        alias: cerad_project.project_repository.doctrine
+
     cerad_game.schedule_GamesWithSlots.import:
         class: Cerad\Bundle\GameBundle\Schedule\Import\GamesWithSlotsImport
-        
+        arguments:
+            - '@cerad_project.project_repository'

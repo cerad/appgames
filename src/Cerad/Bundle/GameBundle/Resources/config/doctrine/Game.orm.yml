@@ -1,0 +1,97 @@
+Cerad\Bundle\GameBundle\Entity\Game:
+    type:  entity
+    table: games
+    repositoryClass: Cerad\Bundle\GameBundle\Entity\GameRepository
+    changeTrackingPolicy: NOTIFY
+
+    uniqueConstraints:
+       game_project_num_index:
+           columns: project_id, num
+
+    id:
+        id:
+            type: integer
+            generator: { strategy: AUTO }
+            
+    oneToMany:
+            
+       #teams:
+       #    targetEntity: V4GameTeam
+       #    mappedBy:     game
+       #    indexBy:      slot
+       #    cascade:      ['all']
+            
+       #persons:
+       #    targetEntity: V4GamePerson
+       #    mappedBy:     game
+       #    indexBy:      slot
+       #    cascade:      ['all']     
+    
+    manyToOne:
+      
+       #level:
+       #  targetEntity: V4Level
+       #  nullable:     false
+          
+       #field:
+       #  targetEntity: V4Field
+       #  nullable:     false
+      
+    fields:
+            
+        projectId:
+            column:   project_id
+            type:     string
+            length:   80
+            nullable: false
+          
+        num:
+            column:   num
+            type:     integer
+            nullable: false
+            
+        role:
+            column:   role
+            type:     string
+            length:   20
+            nullable: false
+            
+        pool:
+            column:   pool
+            type:     string
+            length:   20
+            nullable: true
+            
+        link:
+            column:   link
+            type:     integer
+            nullable: true
+            
+        dtBeg:
+            column:   dt_beg
+            type:     datetime
+            nullable: false
+            
+        dtEnd:
+            column:   dt_end
+            type:     datetime
+            nullable: true      # Maybe a TBD or BYE flag?
+            
+        status:
+            column:   status
+            type:     string
+            length:   20
+            nullable: false
+
+        level:
+            column:   level
+            type:     string
+            length:   40
+            nullable: true
+            
+        field:
+            column:   field
+            type:     string
+            length:   40
+            nullable: true
+            

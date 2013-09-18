@@ -14,6 +14,36 @@ class GamesWithSlotsImport
     protected $season;
     protected $nums;
     
+    protected $projectRepo;
+    
+    public function __construct($projectRepo)
+    {
+        $this->projectRepo = $projectRepo;
+    }
+    protected function processProject($row)
+    {
+        $projectRepo = $this->projectRepo;
+        
+        $params = array($row['domain'],$row['sport'],$row['domainSub'],$row['season']);
+        
+        $projectId = $this->projectRepo->hash($params);
+        
+        $projectx = $projectRepo->find($projectId);
+        if ($projectx) return $projectx;
+        
+        // New project
+        $project = $projectRepo->createProject();
+        $project->setId       ($projectId);
+        $project->setSport    ($row['sport']);
+        $project->setSeason   ($row['season']);
+        $project->setDomain   ($row['domain']);
+        $project->setDomainSub($row['domainSub']);
+        
+        $projectRepo->save($project);
+        $projectRepo->commit();
+        
+        return $project;
+    }
     protected function processRow($row)
     {
         // Process the game number
@@ -25,6 +55,9 @@ class GamesWithSlotsImport
         // Really should not happem but does
         if (isset($this->nums[$num])) return;
         $this->nums[$num] = true;
+        
+        // Get the project
+        $project = $this->processProject($row);
         
         echo sprintf("Row %d %s %s %s %s\n",$num,$row['season'],$row['domain'],$row['domainSub'],$row['level']);
         
