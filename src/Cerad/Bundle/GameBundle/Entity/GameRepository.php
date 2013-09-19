@@ -65,8 +65,14 @@ class GameRepository extends EntityRepository
         $date1Ignore = $this->getScalerValue($criteria,'date1Ignore');
         $date2Ignore = $this->getScalerValue($criteria,'date2Ignore');
         
+        if ($date1On && !$date2On) $date2 = null;
+        if ($date2On && !$date1On) $date1 = null;
+        
         if ($date1Ignore) $date1 = null;
         if ($date2Ignore) $date2 = null;
+        
+        if (!$date1) $date1On = false;
+        if (!$date2) $date2On = false;
         
         if ($date1 && $date2 && ($date1 > $date2))
         {
@@ -74,11 +80,11 @@ class GameRepository extends EntityRepository
         }
         
         /* ===========================================
-         * Build the query
+         * Game ID query
          */
         $qb = $this->createQueryBuilder('game');
      
-        $qb->addSelect('gameTeam');
+        $qb->select('distinct game.id');
         $qb->leftJoin ('game.teams','gameTeam');
         
         if ($projectIds)
@@ -96,12 +102,23 @@ class GameRepository extends EntityRepository
             $qb->andWhere('gameTeam.levelId IN (:levelIds)');
             $qb->setParameter('levelIds',$levelIds);
         }
+        /* ============================================
+         * This is what makes me grab gamesIds first
+         */
         if ($teamNames)
         {
             $qb->andWhere('gameTeam.name IN (:teamNames)');
             $qb->setParameter('teamNames',$teamNames);
         }
         
+        if ($date1On and $date2On)
+        {
+           $qb->andWhere('((DATE(game.dtBeg) = :date1) OR (DATE(game.dtBeg) = :date2))');
+           $qb->setParameter('date1',$date1);
+           $qb->setParameter('date2',$date2);
+           $date1 = null;
+           $date2 = null;
+        }
         if ($date1)
         {
             $op = $date1On ? '=' : '>=';
@@ -119,10 +136,30 @@ class GameRepository extends EntityRepository
             $qb->andWhere('game.num IN (:nums)');
             $qb->setParameter('nums',$criteria['nums']);
         }
-        $qb->addOrderBy('game.dtBeg');
+      //echo $qb->getDql();
+        $gameIds = $qb->getQuery()->getArrayResult();
+        if (count($gameIds) < 1) return array();
+        
+        $ids = array();
+        foreach($gameIds as $gameId)
+        {
+            $ids[] = $gameId['id'];
+        }
+        
+        // Game query
+        $qbx = $this->createQueryBuilder('game');
+        $qbx->addSelect('gameTeam');
+        $qbx->leftJoin ('game.teams','gameTeam');
+        $qbx->andWhere ('game.id IN (:ids)');
+        $qbx->setParameter('ids',$ids);
+        
+      // Sadly, this does not work, need to keep experimenting
+      //$qbx->andWhere ('game.id IN (' . $qb->getDql() . ')');
+
+        $qbx->addOrderBy('game.dtBeg');
 
         
-        return $qb->getQuery()->getResult();
+        return $qbx->getQuery()->getResult();
     }
     /* ========================================================
      * Distinct list of field names for a set of projects
