@@ -4,9 +4,9 @@ namespace Cerad\Bundle\GameBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-class DefaultController extends Controller
+class GameScheduleController extends Controller
 {
-    public function indexAction($name)
+    public function indexAction()
     {
         return $this->render('CeradGameBundle:Default:index.html.twig', array('name' => $name));
     }

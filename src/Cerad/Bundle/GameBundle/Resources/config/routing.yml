@@ -1,3 +1,3 @@
-cerad_game_homepage:
-    pattern:  /hello/{name}
-    defaults: { _controller: CeradGameBundle:Default:index }
+cerad_game_schedule:
+    pattern:  /
+    defaults: { _controller: CeradGameBundle:GameSchedule:index }
