@@ -8,6 +8,12 @@ class GameScheduleController extends Controller
 {
     public function indexAction()
     {
-        return $this->render('CeradGameBundle:Default:index.html.twig', array('name' => $name));
+        $gameRepo = $this->get('cerad_game.game_repository');
+        $games = $gameRepo->findAll();
+        
+        $tplData = array();
+        $tplData['games'] = $games;
+        $tplData['isAdmin'] = false;
+        return $this->render('@CeradGame\Game\Schedule\GameScheduleIndex.html.twig',$tplData);
     }
 }

@@ -1,0 +1,10 @@
+{% extends '@CeradGame/Layout.html.twig' %}
+
+{% block content %}
+<p>
+    Schedule and scores are updated daily around 7:00 AM.
+</p>
+{# include 'CeradArbiterBundle:Schedule:search.html.twig' #}
+{% include '@CeradGame/Game/Schedule/GameScheduleList.html.twig'  %}
+
+{% endblock %}

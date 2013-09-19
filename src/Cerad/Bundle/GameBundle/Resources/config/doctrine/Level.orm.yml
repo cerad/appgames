@@ -1,0 +1,73 @@
+Cerad\Bundle\GameBundle\Entity\Level:
+    type:  entity
+    table: levels
+    repositoryClass: Cerad\Bundle\GameBundle\Entity\LevelRepository
+    changeTrackingPolicy: NOTIFY
+    
+    indexes:
+       project_sport_index:
+           columns: sport
+       project_domain_index:
+           columns: domain
+       project_domain_sub_index:
+           columns: domain_sub
+        
+    id:
+        id:
+            type: string
+            length: 80
+            generator: { strategy: NONE }
+    
+    fields:
+        name:
+            column:   name
+            type:     string
+            length:   20
+            nullable: false
+            
+        div:
+            column:   divx   # Reserves word
+            type:     string
+            length:   8
+            nullable: true
+            
+        age:
+            column:   age
+            type:     string
+            length:   8
+            nullable: true
+            
+        gender:
+            column:   sex
+            type:     string
+            length:   8
+            nullable: true
+            
+        link:
+            column:   link
+            type:     integer
+            nullable: true
+            
+        sport:
+            column:   sport
+            type:     string
+            length:   20
+            nullable: false
+            
+        domain:
+            column:   domain
+            type:     string
+            length:   20
+            nullable: false
+            
+        domainSub:
+            column:   domain_sub
+            type:     string
+            length:   20
+            nullable: false
+            
+        status:
+            column:   status
+            type:     string
+            length:   20
+            nullable: true

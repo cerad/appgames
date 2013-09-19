@@ -5,7 +5,7 @@ class Results
 {
     
 }
-class GamesWithSlotsImport
+class ArbiterGamesWithSlotsImport
 {
     protected $results;
     
@@ -15,11 +15,13 @@ class GamesWithSlotsImport
     protected $nums;
     
     protected $gameRepo;
+    protected $levelRepo;
     protected $projectRepo;
     
-    public function __construct($projectRepo,$gameRepo)
+    public function __construct($projectRepo,$levelRepo,$gameRepo)
     {
         $this->gameRepo    = $gameRepo;
+        $this->levelRepo   = $levelRepo;
         $this->projectRepo = $projectRepo;
     }
     /* =========================================================
@@ -49,13 +51,40 @@ class GamesWithSlotsImport
         
         return $project;
     }
+    /* =========================================================
+     * Locates existing level or creates a new one
+     */
+    protected function processLevel($row)
+    {
+        $levelRepo = $this->levelRepo;
+        
+        $params = array($row['domain'],$row['sport'],$row['domainSub'],$row['level']);
+        
+        $levelId = $this->levelRepo->hash($params);
+        
+        $levelx = $levelRepo->find($levelId);
+        if ($levelx) return $levelx;
+        
+        // New Level
+        $level = $levelRepo->createLevel();
+        $level->setId       ($levelId);
+        $level->setName     ($row['level'    ]);
+        $level->setSport    ($row['sport'    ]);
+        $level->setDomain   ($row['domain'   ]);
+        $level->setDomainSub($row['domainSub']);
+        
+        $levelRepo->save($level);
+        $levelRepo->commit();
+        
+        return $level;
+    }
     /* =================================================================
      * Game Team
      */
     protected function processGameTeam($game,$gameReportStatus,$team,$name,$score)
     {
-        $team->setName ($name);
-        $team->setLevel($game->getLevel());
+        $team->setName   ($name);
+        $team->setLevelId($game->getLevelId());
         
         if ($gameReportStatus != 'No Report') { $team->setScore((integer)$score); }
         
@@ -76,8 +105,9 @@ class GamesWithSlotsImport
         if (isset($this->nums[$num])) return;
         $this->nums[$num] = true;
         
-        // Get the project
+        // Get the project and level
         $project = $this->processProject($row);
+        $level   = $this->processLevel  ($row);
         
         // Get the game or create a new one
         $gameRepo = $this->gameRepo;
@@ -88,9 +118,9 @@ class GamesWithSlotsImport
             $game->setProjectId($project->getId());
             $game->setNum($num);
         }
-        $game->setLevel ($row['level']);
-        $game->setField ($row['site' ]);
-        $game->setStatus($row['status']);
+        $game->setField  ($row['site' ]);
+        $game->setLevelId($level->getId());
+        $game->setStatus ($row['status']);
         
         $dtBeg = \DateTime::createFromFormat('Y-m-d*H:i:s',$row['dtBeg']);
         $dtEnd = \DateTime::createFromFormat('Y-m-d*H:i:s',$row['dtEnd']);

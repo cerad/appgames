@@ -25,8 +25,7 @@ class GameTeam extends AbstractEntity
     protected $team;
     protected $name;
     
-  //protected $project; // Always get from game
-    protected $level;
+    protected $levelId; // Could be different than the game
     
     protected $div;
     protected $age;
@@ -39,11 +38,11 @@ class GameTeam extends AbstractEntity
     
     public function getId()      { return $this->id;      }
     public function getSlot()    { return $this->slot;    }
-    public function getRole()    { return $this->role;}
+    public function getRole()    { return $this->role;    }
     public function getGame()    { return $this->game;    }
     public function getTeam()    { return $this->team;    }
     public function getName()    { return $this->name;    }
-    public function getLevel()   { return $this->level;   }
+    public function getLevelId() { return $this->levelId; }
     public function getScore()   { return $this->score;   }
     public function getStatus()  { return $this->status;  }
     public function getConduct() { return $this->conduct; }
@@ -53,7 +52,7 @@ class GameTeam extends AbstractEntity
     public function setGame    ($value) { $this->onPropertySet('game',    $value); }
     public function setTeam    ($value) { $this->onPropertySet('team',    $value); }
     public function setName    ($value) { $this->onPropertySet('name',    $value); }
-    public function setLevel   ($value) { $this->onPropertySet('level',   $value); }
+    public function setLevelId ($value) { $this->onPropertySet('levelId', $value); }
     public function setScore   ($value) { $this->onPropertySet('score',   $value); }
     public function setStatus  ($value) { $this->onPropertySet('status',  $value); }
     public function setConduct ($value) { $this->onPropertySet('conduct', $value); }

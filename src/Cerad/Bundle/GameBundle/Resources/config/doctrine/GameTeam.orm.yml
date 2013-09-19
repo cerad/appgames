@@ -49,10 +49,10 @@ Cerad\Bundle\GameBundle\Entity\GameTeam:
             length:   20
             nullable: true
             
-        level:
-            column:   level
+        levelId:
+            column:   level_id
             type:     string
-            length:   40
+            length:   80
             nullable: true
              
         conduct:

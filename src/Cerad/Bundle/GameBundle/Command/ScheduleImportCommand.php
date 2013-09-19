@@ -84,7 +84,7 @@ class ScheduleImportCommand extends ContainerAwareCommand
         $params['format'] = $parts[2];
         $params['suffix'] = $parts[3];
         
-        $importServiceId = sprintf('cerad_game.schedule_%s.import',$params['format']);
+        $importServiceId = sprintf('cerad_game.schedule_Arbiter%s.import',$params['format']);
         $importService = $this->getService($importServiceId);
         
         $results = $importService->import($params);

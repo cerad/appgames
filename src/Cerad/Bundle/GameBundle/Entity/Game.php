@@ -21,8 +21,9 @@ class Game extends AbstractEntity
     protected $dtBeg; // DateTime begin
     protected $dtEnd; // DateTime end
     
+    protected $levelId;
     protected $projectId;
-    protected $level;
+    
     protected $field;
     
     protected $status;
@@ -36,21 +37,23 @@ class Game extends AbstractEntity
     public function getPool()    { return $this->pool;    }
     public function getLink()    { return $this->link;    }
     public function getField()   { return $this->field;   }
-    public function getLevel()   { return $this->level;   }
     public function getDtBeg()   { return $this->dtBeg;   }
     public function getDtEnd()   { return $this->dtEnd;   }
     public function getStatus()  { return $this->status;  }
-    public function getProject() { return $this->project; }
+    
+    public function getLevelId()   { return $this->levelId;   }
+    public function getProjectId() { return $this->projectId; }
     
     public function setNum      ($value) { $this->onPropertySet('num',      $value); }
     public function setLink     ($value) { $this->onPropertySet('link',     $value); }
     public function setRole     ($value) { $this->onPropertySet('role',     $value); }
     public function setPool     ($value) { $this->onPropertySet('pool',     $value); }
     public function setField    ($value) { $this->onPropertySet('field',    $value); }
-    public function setLevel    ($value) { $this->onPropertySet('level',    $value); }
     public function setDtBeg    ($value) { $this->onPropertySet('dtBeg',    $value); }
     public function setDtEnd    ($value) { $this->onPropertySet('dtEnd',    $value); }
     public function setStatus   ($value) { $this->onPropertySet('status',   $value); }
+    
+    public function setLevelId  ($value) { $this->onPropertySet('levelId',  $value); }
     public function setProjectId($value) { $this->onPropertySet('projectId',$value); }
     
     /* =======================================
