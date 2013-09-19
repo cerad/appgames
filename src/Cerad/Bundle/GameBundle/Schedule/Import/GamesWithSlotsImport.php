@@ -14,12 +14,17 @@ class GamesWithSlotsImport
     protected $season;
     protected $nums;
     
+    protected $gameRepo;
     protected $projectRepo;
     
-    public function __construct($projectRepo)
+    public function __construct($projectRepo,$gameRepo)
     {
+        $this->gameRepo    = $gameRepo;
         $this->projectRepo = $projectRepo;
     }
+    /* =========================================================
+     * Locates existing project or creates a new one
+     */
     protected function processProject($row)
     {
         $projectRepo = $this->projectRepo;
@@ -44,6 +49,9 @@ class GamesWithSlotsImport
         
         return $project;
     }
+    /* ==================================================
+     * Handles one row at a time
+     */
     protected function processRow($row)
     {
         // Process the game number
@@ -59,10 +67,34 @@ class GamesWithSlotsImport
         // Get the project
         $project = $this->processProject($row);
         
+        // Get the game or create a new one
+        $gameRepo = $this->gameRepo;
+        $game = $gameRepo->findOneByProjectNum($project->getId(),$num);
+        if (!$game)
+        {
+            $game = $gameRepo->createGame();
+            $game->setProjectId($project->getId());
+            $game->setNum($num);
+        }
+        $game->setLevel ($row['level']);
+        $game->setField ($row['site' ]);
+        $game->setStatus($row['status']);
+        
+        $dtBeg = \DateTime::createFromFormat('Y-m-d*H:i:s',$row['dtBeg']);
+        $dtEnd = \DateTime::createFromFormat('Y-m-d*H:i:s',$row['dtEnd']);
+       
+        $game->setDtBeg($dtBeg);
+        $game->setDtEnd($dtEnd);
+        
+        $gameRepo->save($game);
+        
         echo sprintf("Row %d %s %s %s %s\n",$num,$row['season'],$row['domain'],$row['domainSub'],$row['level']);
         
         return;
     }
+    /* ===============================================================
+     * Starts everything off
+     */
     public function import($params)
     {
         // Save some
@@ -118,7 +150,9 @@ class GamesWithSlotsImport
 
             // On to the next one
             $reader->next('Detail');
-        }        
+        }
+        $this->gameRepo->commit();
+        
         // Done
         $reader->close();
         return $results;

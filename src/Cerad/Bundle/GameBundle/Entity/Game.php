@@ -14,7 +14,7 @@ class Game extends AbstractEntity
     protected $id;
     
     protected $num;   // Unique within project
-    protected $role;
+    protected $role = self::RoleGame;
     protected $pool;
     protected $link;   // Maybe to link crews?
     

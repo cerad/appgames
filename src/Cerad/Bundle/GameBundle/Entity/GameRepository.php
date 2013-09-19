@@ -17,17 +17,9 @@ class GameRepository extends EntityRepository
     {
         return $id ? parent::find($id) : null;
     }
-    public function findByFed($id)
+    public function findOneByProjectNum($projectId,$num)
     {
-        if (!$id) return null;
-        
-        $repo = $this->_em->getRepository('CeradPersonBundle:PersonFed');
-        
-        $fed = $repo->find($id); 
-        
-        if ($fed) return $fed->getPerson();
-        
-        return null;
+        return $this->findOneBy(array('projectId' => $projectId, 'num' => $num));    
     }
     public function findFed($id)
     {

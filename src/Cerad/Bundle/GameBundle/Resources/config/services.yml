@@ -1,14 +1,11 @@
-parameters:
-#    cerad_game.example.class: Cerad\Bundle\GameBundle\Example
-
 services:
-#    cerad_game.example:
-#        class: %cerad_game.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+
+# =============================================================
+# Project stuff
 
     cerad_project.entity_manager.doctrine:
         alias: doctrine.orm.default_entity_manager
-
+        
     cerad_project.project_repository.doctrine:
         class:  Cerad\Bundle\GameBundle\Entity\ProjectRepository
         factory_service: 'cerad_project.entity_manager.doctrine'
@@ -18,8 +15,28 @@ services:
             
     cerad_project.project_repository:
         alias: cerad_project.project_repository.doctrine
+        
+# =============================================================
+# Game stuff
 
+    cerad_game.entity_manager.doctrine:
+        alias: doctrine.orm.default_entity_manager
+
+    cerad_game.game_repository.doctrine:
+        class:  Cerad\Bundle\GameBundle\Entity\GameRepository
+        factory_service: 'cerad_game.entity_manager.doctrine'
+        factory_method:  'getRepository'
+        arguments:  
+            - 'Cerad\Bundle\GameBundle\Entity\Game'
+            
+    cerad_game.game_repository:
+        alias: cerad_game.game_repository.doctrine
+
+# ============================================
+# Imports
     cerad_game.schedule_GamesWithSlots.import:
         class: Cerad\Bundle\GameBundle\Schedule\Import\GamesWithSlotsImport
         arguments:
             - '@cerad_project.project_repository'
+            - '@cerad_game.game_repository'
+            
