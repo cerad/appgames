@@ -55,8 +55,18 @@ doctrine:
 
     orm:
         auto_generate_proxy_classes: %kernel.debug%
-        auto_mapping: true
-
+       #auto_mapping: true
+        entity_managers:
+            default:
+                connection: default
+                mappings:
+                    CeradGameBundle: ~
+                dql:
+                    datetime_functions:
+                        date:  Cerad\Bundle\GameBundle\Doctrine\DQL\Date
+                        time:  Cerad\Bundle\GameBundle\Doctrine\DQL\Time
+                        month: Cerad\Bundle\GameBundle\Doctrine\DQL\Month
+                        
 # Swiftmailer Configuration
 swiftmailer:
     transport: %mailer_transport%

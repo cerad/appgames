@@ -49,7 +49,7 @@ services:
         alias: cerad_game.game_repository.doctrine
 
 # ============================================
-# Imports
+# Misc
     cerad_game.schedule_ArbiterGamesWithSlots.import:
         class: Cerad\Bundle\GameBundle\Schedule\Import\ArbiterGamesWithSlotsImport
         arguments:
@@ -63,4 +63,12 @@ services:
             - '@cerad_level.level_repository'
         tags:
             - { name: twig.extension }
+            
+    cerad_game.game_schedule_search.form_type:
+        class: Cerad\Bundle\GameBundle\FormType\GameScheduleSearchFormType
+        arguments: 
+            - '@cerad_project.project_repository'
+            - '@cerad_level.level_repository'
+        tags:
+            - { name: form.type, alias: game_schedule_search }
             
