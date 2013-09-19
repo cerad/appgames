@@ -37,7 +37,7 @@
             </td>
            <td><table>
                 {% for gameTeam in game.teams %}
-                    <tr><td>{{ gameTeam.score }}</td><td>{{ gameTeam.name }}</td></tr>
+                    <tr><td>{{ cerad_game_score(gameTeam.score) }}</td><td>{{ gameTeam.name }}</td></tr>
                 {% endfor %}
             </table></td>
        </tr>

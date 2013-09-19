@@ -25,7 +25,13 @@ class GameExtension extends \Twig_Extension
     {
         return array(            
             'cerad_level_find' => new \Twig_Function_Method($this, 'findLevel'),
+            'cerad_game_score' => new \Twig_Function_Method($this, 'gameScore'),
         );
+    }
+    public function gameScore($score)
+    {
+        if ($score === null) return '_:';
+        return $score . ':';
     }
     public function findLevel($levelId)
     {

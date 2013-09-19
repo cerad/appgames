@@ -28,8 +28,12 @@ class AbstractEntity implements NotifyPropertyChanged
         $oldValue = $this->$name;
         
         if ($oldValue === $newValue) return;
-        if ($oldValue ==  $newValue) return;
-        
+        if ($oldValue ==  $newValue) 
+        {
+            // Fine unless have null stuff
+            // NULL and 0 '' both match
+            if (($oldValue !== null) && ($newValue !== null)) return;
+        }
         // Value changed
         $this->$name = $newValue;
         

@@ -83,10 +83,17 @@ class ArbiterGamesWithSlotsImport
      */
     protected function processGameTeam($game,$gameReportStatus,$team,$name,$score)
     {
+        if (!$name) $name = 'TBD';
+        
         $team->setName   ($name);
         $team->setLevelId($game->getLevelId());
         
-        if ($gameReportStatus != 'No Report') { $team->setScore((integer)$score); }
+        if ($gameReportStatus != 'No Report') 
+        { 
+            $score = (integer)$score;
+            if (!$score) $score = 0; // PHP stripping away 0 strings
+            $team->setScore((integer)$score); 
+        }
         
         return $team;    
     }
@@ -134,6 +141,8 @@ class ArbiterGamesWithSlotsImport
         
         // And save
         $gameRepo->save($game);
+        
+        return;
         
         echo sprintf("Row %d %s %s %s %s\n",$num,$row['season'],$row['domain'],$row['domainSub'],$row['level']);
         
