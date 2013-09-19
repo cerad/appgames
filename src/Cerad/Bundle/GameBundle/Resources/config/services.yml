@@ -69,6 +69,7 @@ services:
         arguments: 
             - '@cerad_project.project_repository'
             - '@cerad_level.level_repository'
+            - '@cerad_game.game_repository'
         tags:
             - { name: form.type, alias: game_schedule_search }
             

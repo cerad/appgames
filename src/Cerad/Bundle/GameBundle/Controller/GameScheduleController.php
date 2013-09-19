@@ -16,15 +16,8 @@ class GameScheduleController extends Controller
     public function indexAction(Request $request)
     {
         // The search model
-        $model = $this->getModel();
+        $model = $this->getModel($request);
         
-        // Pull form session
-        $session = $request->getSession();
-        if ($session->has(self::SESSION_GAME_SCHEDULE_SEARCH))
-        {
-            $modelSession = $session->get(self::SESSION_GAME_SCHEDULE_SEARCH);
-            $model = array_merge($model,$modelSession);
-        }
         // The form stuff
         $searchFormType = $this->get('cerad_game.game_schedule_search.form_type');
         $searchForm = $this->createForm($searchFormType,$model);
@@ -35,7 +28,7 @@ class GameScheduleController extends Controller
         {   
             $modelPosted = $searchForm->getData();
             
-            $session->set(self::SESSION_GAME_SCHEDULE_SEARCH,$modelPosted);
+            $request->getSession()->set(self::SESSION_GAME_SCHEDULE_SEARCH,$modelPosted);
             
             return $this->redirect($this->generateUrl('cerad_game_schedule'));
         }
@@ -51,7 +44,7 @@ class GameScheduleController extends Controller
         $tplData['isAdmin'] = false;
         return $this->render('@CeradGame\Game\Schedule\GameScheduleIndex.html.twig',$tplData);
     }
-    public function getModel()
+    public function getModel(Request $request)
     {   
         // Build the search parameter information
         $model = array();
@@ -80,6 +73,22 @@ class GameScheduleController extends Controller
         $model['date1Ignore'] = false;
         $model['date2Ignore'] = false;
         
+        // Merge form session
+        $session = $request->getSession();
+        if ($session->has(self::SESSION_GAME_SCHEDULE_SEARCH))
+        {
+            $modelSession = $session->get(self::SESSION_GAME_SCHEDULE_SEARCH);
+            $model = array_merge($model,$modelSession);
+        }
+        
+        // Add in project and level ids
+        $levelRepo   = $this->get('cerad_level.level_repository');
+        $projectRepo = $this->get('cerad_project.project_repository');
+        
+        $model['levelIds'  ] = $levelRepo->queryLevelIds    ($model);
+        $model['projectIds'] = $projectRepo->queryProjectIds($model);
+    
+        // Done
         return $model;
     }
 }

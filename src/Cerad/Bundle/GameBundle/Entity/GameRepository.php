@@ -45,7 +45,12 @@ class GameRepository extends EntityRepository
      */
     public function queryGameSchedule($criteria)
     {
-        $nums = null;
+        $nums       = $this->getArrayValue($criteria,'nums');
+        $levelIds   = $this->getArrayValue($criteria,'levelIds');
+        $projectIds = $this->getArrayValue($criteria,'projectIds');
+        
+        $teamNames  = $this->getArrayValue($criteria,'teams');
+        $fieldNames = $this->getArrayValue($criteria,'fields');
         
         /* =================================================
          * Dates are always so much fun
@@ -72,6 +77,30 @@ class GameRepository extends EntityRepository
          * Build the query
          */
         $qb = $this->createQueryBuilder('game');
+     
+        $qb->addSelect('gameTeam');
+        $qb->leftJoin ('game.teams','gameTeam');
+        
+        if ($projectIds)
+        {
+            $qb->andWhere('game.projectId IN (:projectIds)');
+            $qb->setParameter('projectIds',$projectIds);
+        }
+        if ($fieldNames)
+        {
+            $qb->andWhere('game.field IN (:fieldNames)');
+            $qb->setParameter('fieldNames',$fieldNames);
+        }
+        if ($levelIds)
+        {
+            $qb->andWhere('gameTeam.levelId IN (:levelIds)');
+            $qb->setParameter('levelIds',$levelIds);
+        }
+        if ($teamNames)
+        {
+            $qb->andWhere('gameTeam.name IN (:teamNames)');
+            $qb->setParameter('teamNames',$teamNames);
+        }
         
         if ($date1)
         {
@@ -90,10 +119,78 @@ class GameRepository extends EntityRepository
             $qb->andWhere('game.num IN (:nums)');
             $qb->setParameter('nums',$criteria['nums']);
         }
-        echo $qb->getDql();
+        $qb->addOrderBy('game.dtBeg');
+
         
         return $qb->getQuery()->getResult();
     }
+    /* ========================================================
+     * Distinct list of field names for a set of projects
+     */
+    public function queryFieldChoices($criteria = array())
+    {
+        $projectIds = $this->getArrayValue($criteria,'projectIds');
+        
+        // Build query
+        $qb = $this->createQueryBuilder('game');
+        
+        $qb->select('distinct game.field');
+        
+        if ($projectIds)
+        {
+            $qb->andWhere('game.projectId IN (:projectIds)');
+            $qb->setParameter('projectIds',$projectIds);
+        }
+        $qb->addOrderBy('game.field');
+       
+        $items = $qb->getQuery()->getArrayResult();
+        
+        $choices = array();
+        foreach($items as $item)
+        {
+            $choices[$item['field']] = $item['field'];
+        }
+        return $choices;
+    }
+    /* ========================================================
+     * Distinct list of team names for a set of projects and levels
+     */
+    public function queryTeamChoices($criteria = array())
+    {
+        $levelIds   = $this->getArrayValue($criteria,'levelIds');
+        $projectIds = $this->getArrayValue($criteria,'projectIds');
+        
+        // Build query
+        $qb = $this->createQueryBuilder('game');
+        
+        $qb->select('distinct gameTeam.name');
+        
+        $qb->leftJoin('game.teams','gameTeam');
+        
+        if ($projectIds)
+        {
+            $qb->andWhere('game.projectId IN (:projectIds)');
+            $qb->setParameter('projectIds',$projectIds);
+        }
+        if ($levelIds)
+        {
+            $qb->andWhere('gameTeam.levelId IN (:levelIds)');
+            $qb->setParameter('levelIds',$levelIds);
+        }
+        $qb->addOrderBy('gameTeam.name');
+       
+        $items = $qb->getQuery()->getArrayResult();
+        
+        $choices = array();
+        foreach($items as $item)
+        {
+            $choices[$item['name']] = $item['name'];
+        }
+        return $choices;
+    }
+    /* ========================================================
+     * For pulling stuff out of criteria
+     */
     protected function getScalerValue($criteria,$name)
     {
         if (!isset($criteria[$name])) return null;
@@ -110,8 +207,16 @@ class GameRepository extends EntityRepository
         
         if (count($value) < 1) return null;
         
-        return array_values($value);
+        // This nonsense filters out 0 or null values
+        $values  = $value;
+        $valuesx = array();
+        foreach($values as $value)
+        {
+            if ($value) $valuesx[] = $value;
+        }
+        if (count($valuesx) < 1) return null;
         
+        return $valuesx;
     }
 }
 ?>

@@ -12,14 +12,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class GameScheduleSearchFormTypeSubscriber implements EventSubscriberInterface
 {
     private $factory;
-    private $manager;
-    private $params;
     
-    public function __construct(FormFactoryInterface $factory, $manager, $params)
+    private $gameRepo;
+    private $levelRepo;
+    private $projectRepo;
+    
+    public function __construct(FormFactoryInterface $factory, $projectRepo, $levelRepo, $gameRepo)
     {
-        $this->factory = $factory;
-        $this->manager = $manager;
-        $this->params  = $params;
+        $this->factory     = $factory;
+        $this->projectRepo = $projectRepo;
+        $this->levelRepo   = $levelRepo;
+        $this->gameRepo    = $gameRepo;
     }
 
     public static function getSubscribedEvents()
@@ -28,7 +31,21 @@ class GameScheduleSearchFormTypeSubscriber implements EventSubscriberInterface
         // event and that the preSetData method should be called.
         return array(FormEvents::PRE_SET_DATA => 'preSetData');
     }
-
+    protected function genMultipleChoice($name, $choices, $width, $size = 10)
+    {
+        $style = sprintf('width: %d;',$width);
+        
+        return $this->factory->createNamed($name, 'choice', null, array(
+            'label'           => false,
+            'required'        => false,
+            'choices'         => $choices,
+            'expanded'        => false,
+            'multiple'        => true,
+            'disabled'        => false,
+            'auto_initialize' => false,
+            'attr' => array('style' => $style, 'size' => $size),
+        ));
+    }
     public function preSetData(FormEvent $event)
     {
         $data = $event->getData();
@@ -37,91 +54,30 @@ class GameScheduleSearchFormTypeSubscriber implements EventSubscriberInterface
         
         $form = $event->getForm();
         
-        // Generate field pick list
-        $fields = $this->manager->loadFieldChoices($data);
-        array_unshift($fields,'All Fields');
-        $form->add($this->factory->createNamed('fields', 'choice', null, array(
-            'label'         => 'Fields',
-            'required'      => false,
-            'choices'       => $fields,
-            'expanded'      => false,
-            'multiple'      => true,
-            'disabled'      => false,
-            'attr' => array('size' => 10),
-        )));
-        // Generate team pick list
-        $teams = $this->manager->loadTeamNames($data);
-        array_unshift($teams,'All Teams');
-        $form->add($this->factory->createNamed('teams', 'choice', null, array(
-            'label'         => 'Teams',
-            'required'      => false,
-            'choices'       => $teams,
-            'expanded'      => false,
-            'multiple'      => true,
-            'disabled'      => false,
-            'attr' => array('size' => 10),
-        )));
-        // Generate levels pick list
-        $levels  = $this->manager->loadLevelChoices($data);
-        array_unshift($levels,'All Levels');
-        $form->add($this->factory->createNamed('levels', 'choice', null, array(
-            'label'         => 'Levels',
-            'required'      => false,
-            'choices'       => $levels,
-            'expanded'      => false,
-            'multiple'      => true,
-            'disabled'      => false,
-            'attr' => array('size' => 10),
-        )));
-        // Generate sports pick list
-        $names  = $this->manager->loadDomainSubChoices($data);
-        array_unshift($names,'All Sub Groups');
-        $form->add($this->factory->createNamed('domainSubs', 'choice', null, array(
-            'label'         => 'Sub Groups',
-            'required'      => false,
-            'choices'       => $names,
-            'expanded'      => false,
-            'multiple'      => true,
-            'disabled'      => false,
-            'attr' => array('size' => 10),
-        )));
-        // Generate groups pick list
-        $names  = $this->manager->loadDomainChoices($data);
-        array_unshift($names,'All Groups');
-        $form->add($this->factory->createNamed('domains', 'choice', null, array(
-            'label'         => 'Groups',
-            'required'      => false,
-            'choices'       => $names,
-            'expanded'      => false,
-            'multiple'      => true,
-            'disabled'      => false,
-            'attr' => array('size' => 10),
-        )));
+        // Generate groups select
+        $domains = $this->projectRepo->queryDomainChoices($data);
+        array_unshift($domains,'All Groups');
+        $form->add($this->genMultipleChoice('domains',$domains,100));
         
-        // Generate seasons pick list
-        $names = $this->manager->loadSeasonChoices($data);
-        array_unshift($names,'All Seasons');
-        $form->add($this->factory->createNamed('seasons', 'choice', null, array(
-            'label'         => 'Seasons',
-            'required'      => false,
-            'choices'       => $names,
-            'expanded'      => false,
-            'multiple'      => true,
-            'disabled'      => false,
-            'attr' => array('size' => 4),
-        )));
-        // Generate sports pick list
-        $names = $this->manager->loadSportChoices($data);
-        array_unshift($names,'All Sports');
-        $form->add($this->factory->createNamed('sports', 'choice', null, array(
-            'label'         => 'Sports',
-            'required'      => false,
-            'choices'       => $names,
-            'expanded'      => false,
-            'multiple'      => true,
-            'disabled'      => false,
-            'attr' => array('size' => 4),
-        )));
+        // Generate sub groups select
+        $domainSubs = $this->projectRepo->queryDomainSubChoices($data);
+        array_unshift($domainSubs,'All Sub Groups');
+        $form->add($this->genMultipleChoice('domainSubs',$domainSubs,200));
+        
+         // Generate levels select
+        $levels = $this->levelRepo->queryLevelChoices($data);
+        array_unshift($levels,'All Levels');
+        $form->add($this->genMultipleChoice('levels',$levels,200));
+        
+        // Generate field select
+        $fields = $this->gameRepo->queryFieldChoices($data);
+        array_unshift($fields,'All Fields');
+        $form->add($this->genMultipleChoice('fields',$fields,200));
+        
+         // Generate teams select
+        $teams = $this->gameRepo->queryTeamChoices($data);
+        array_unshift($teams,'All Teams');
+        $form->add($this->genMultipleChoice('teams',$teams,200));        
     }
 }
 
@@ -129,19 +85,25 @@ class GameScheduleSearchFormType extends AbstractType
 {
     public function getName() { return 'game_schedule_search'; }
     
+    protected $gameRepo;
     protected $levelRepo;
     protected $projectRepo;
     
-    public function __construct($projectRepo,$levelRepo)
+    public function __construct($projectRepo,$levelRepo,$gameRepo)
     {
+        $this->gameRepo    = $gameRepo;
         $this->levelRepo   = $levelRepo;
         $this->projectRepo = $projectRepo;
     }
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // For dynamic fields
-        //$subscriber = new SearchFormTypeSubscriber($builder->getFormFactory(),$this->manager,$this->params);
-        //$builder->addEventSubscriber($subscriber);
+        $subscriber = new GameScheduleSearchFormTypeSubscriber(
+                $builder->getFormFactory(),
+                $this->projectRepo,
+                $this->levelRepo,
+                $this->gameRepo);
+        $builder->addEventSubscriber($subscriber);
         
         $builder->add('date1', 'date', array(
             'label'         => 'From Date',
