@@ -65,7 +65,9 @@ class Game extends AbstractEntity
     /* =======================================
      * Team stuff
      */
-    public function getTeams($sort = true) 
+   public function createGameTeam($params = null) { return new GameTeam($params); }
+   
+   public function getTeams($sort = true) 
     { 
         if (!$sort) return $this->teams;
         
@@ -79,15 +81,25 @@ class Game extends AbstractEntity
         $this->teams[$team->getSlot()] = $team;
         
         $team->setGame($this);
+        
+        $this->onPropertyChanged('teams');
     }
-    public function getTeamForSlot($slot)
+    public function getTeamForSlot($slot,$autoCreate = true)
     {
         if (isset($this->teams[$slot])) return $this->teams[$slot];
         
-        return null;
+        if (!$autoCreate) return null;
+        
+        $gameTeam = $this->createGameTeam();
+        $gameTeam->setSlot($slot);
+        $role = $gameTeam->getRoleForSlot($slot);
+        $gameTeam->setRole($role);
+        
+        $this->addTeam($gameTeam);
+        return $gameTeam;
     }
-    public function getHomeTeam() { return $this->getTeamForSlot(V4GameTeam::SlotHome); }
-    public function getAwayTeam() { return $this->getTeamForSlot(V4GameTeam::SlotAway); }
+    public function getHomeTeam($autoCreate = true) { return $this->getTeamForSlot(GameTeam::SlotHome,$autoCreate); }
+    public function getAwayTeam($autoCreate = true) { return $this->getTeamForSlot(GameTeam::SlotAway,$autoCreate); }
     
     /* =======================================
      * Person stuff

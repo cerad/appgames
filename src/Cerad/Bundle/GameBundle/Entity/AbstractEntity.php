@@ -16,7 +16,7 @@ class AbstractEntity implements NotifyPropertyChanged
     {
         $this->listeners[] = $listener;
     }    
-    protected function onPropertyChanged($propName, $oldValue, $newValue)
+    protected function onPropertyChanged($propName, $oldValue = null, $newValue = null)
     {
         foreach ($this->listeners as $listener) 
         {

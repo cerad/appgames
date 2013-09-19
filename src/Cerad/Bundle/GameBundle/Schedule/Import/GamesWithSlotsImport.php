@@ -49,6 +49,18 @@ class GamesWithSlotsImport
         
         return $project;
     }
+    /* =================================================================
+     * Game Team
+     */
+    protected function processGameTeam($game,$gameReportStatus,$team,$name,$score)
+    {
+        $team->setName ($name);
+        $team->setLevel($game->getLevel());
+        
+        if ($gameReportStatus != 'No Report') { $team->setScore((integer)$score); }
+        
+        return $team;    
+    }
     /* ==================================================
      * Handles one row at a time
      */
@@ -86,6 +98,11 @@ class GamesWithSlotsImport
         $game->setDtBeg($dtBeg);
         $game->setDtEnd($dtEnd);
         
+        // Teams
+        $this->processGameTeam($game,$row['gameReportStatus'],$game->getHomeTeam(),$row['homeTeamName'],$row['homeTeamScore']);
+        $this->processGameTeam($game,$row['gameReportStatus'],$game->getAwayTeam(),$row['awayTeamName'],$row['awayTeamScore']);
+        
+        // And save
         $gameRepo->save($game);
         
         echo sprintf("Row %d %s %s %s %s\n",$num,$row['season'],$row['domain'],$row['domainSub'],$row['level']);

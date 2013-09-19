@@ -1,0 +1,62 @@
+Cerad\Bundle\GameBundle\Entity\GameTeam:
+    type:  entity
+    table: game_teams
+    changeTrackingPolicy: NOTIFY
+
+    id:
+        id:
+            type: integer
+            generator: { strategy: AUTO }
+            
+    manyToOne:
+          
+        game:
+            targetEntity: Game
+            inversedBy:   teams
+            nullable:     false
+            
+       #level:
+       #    targetEntity: V4Level
+       #    nullable:     false  
+      
+    fields:
+            
+        slot:
+            column:   slot
+            type:     integer
+            nullable: false
+            
+        role:
+            column:   role
+            type:     string
+            length:   20
+            nullable: false
+                
+        name:
+            column:   name
+            type:     string
+            length:   60
+            nullable: false
+            
+        score:
+            column:   score
+            type:     integer
+            nullable: true
+            
+        status:
+            column:   status
+            type:     string
+            length:   20
+            nullable: true
+            
+        level:
+            column:   level
+            type:     string
+            length:   40
+            nullable: true
+             
+        conduct:
+            column:   conduct
+            type:     text
+            nullable: true
+

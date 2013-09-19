@@ -14,12 +14,12 @@ Cerad\Bundle\GameBundle\Entity\Game:
             generator: { strategy: AUTO }
             
     oneToMany:
-            
-       #teams:
-       #    targetEntity: V4GameTeam
-       #    mappedBy:     game
-       #    indexBy:      slot
-       #    cascade:      ['all']
+   
+       teams:
+           targetEntity: GameTeam
+           mappedBy:     game
+           indexBy:      slot
+           cascade:      ['all']
             
        #persons:
        #    targetEntity: V4GamePerson
