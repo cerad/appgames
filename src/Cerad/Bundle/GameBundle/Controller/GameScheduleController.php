@@ -62,7 +62,7 @@ class GameScheduleController extends Controller
         
         $date1 = new \DateTime();
         $date2 = clone $date1;
-        $date2->add(new \DateInterval('P10D'));
+        $date2->add(new \DateInterval('P2D'));
         
         $model['date1'] = $date1->format('Y-m-d');
         $model['date2'] = $date2->format('Y-m-d');
