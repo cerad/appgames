@@ -148,6 +148,18 @@ class ArbiterGamesWithSlotsImport
         
         return;
     }
+    /* =================================================
+     * Need to fool around with commits to prevent memory exhaustion
+     */
+    protected $commitCount;
+    
+    protected function commit()
+    {
+        if ($this->commitCount++ < 200) return;
+        
+        $this->gameRepo->commit();
+        $this->commitCount = 0;
+    }
     /* ===============================================================
      * Starts everything off
      */
@@ -204,6 +216,8 @@ class ArbiterGamesWithSlotsImport
             
             $this->processRow($row);
 
+            $this->commit();
+            
             // On to the next one
             $reader->next('Detail');
         }

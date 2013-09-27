@@ -1,3 +1,8 @@
 cerad_game_schedule:
     pattern:  /
     defaults: { _controller: CeradGameBundle:GameSchedule:index }
+    
+cerad_game_schedule_import:
+    pattern:  /import
+    defaults: { _controller: CeradGameBundle:GameScheduleImport:import }
+  
