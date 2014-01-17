@@ -56,7 +56,7 @@ class GameScheduleController extends Controller
         $model['teams' ]  = array();
         $model['fields']  = array();
         
-        $model['seasons']  = array('Fall2013');
+        $model['seasons']  = array('Spring2014');
         $model['sports']   = array('Soccer');
         $model['statuses'] = array();
         
