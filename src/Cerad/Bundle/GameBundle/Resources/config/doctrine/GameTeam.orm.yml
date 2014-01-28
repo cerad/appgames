@@ -2,6 +2,9 @@ Cerad\Bundle\GameBundle\Entity\GameTeam:
     type:  entity
     table: game_teams
     changeTrackingPolicy: NOTIFY
+    uniqueConstraints:
+       game_team_game_slot_index:
+           columns: gameId, slot
 
     id:
         id:
@@ -14,6 +17,9 @@ Cerad\Bundle\GameBundle\Entity\GameTeam:
             targetEntity: Game
             inversedBy:   teams
             nullable:     false
+            joinColumn:
+                name:                 gameId
+                referencedColumnName: id
             
        #level:
        #    targetEntity: V4Level
@@ -31,13 +37,25 @@ Cerad\Bundle\GameBundle\Entity\GameTeam:
             type:     string
             length:   20
             nullable: false
+            
+        levelKey:
+            column:   levelKey
+            type:     string
+            length:   80
+            nullable: true
                 
+        groupKeySlot:
+            column:   groupKeySlot
+            type:     string
+            length:   40
+            nullable: true
+            
         name:
             column:   name
             type:     string
-            length:   60
+            length:   80
             nullable: false
-            
+                        
         score:
             column:   score
             type:     integer
@@ -47,12 +65,6 @@ Cerad\Bundle\GameBundle\Entity\GameTeam:
             column:   status
             type:     string
             length:   20
-            nullable: true
-            
-        levelId:
-            column:   level_id
-            type:     string
-            length:   80
             nullable: true
              
         conduct:

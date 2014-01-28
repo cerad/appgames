@@ -6,7 +6,7 @@ Cerad\Bundle\GameBundle\Entity\Game:
 
     uniqueConstraints:
        game_project_num_index:
-           columns: project_id, num
+           columns: projectKey, num
 
     id:
         id:
@@ -39,8 +39,8 @@ Cerad\Bundle\GameBundle\Entity\Game:
       
     fields:
             
-        projectId:
-            column:   project_id
+        projectKey:
+            column:   projectKey
             type:     string
             length:   80
             nullable: false
@@ -56,26 +56,44 @@ Cerad\Bundle\GameBundle\Entity\Game:
             length:   20
             nullable: false
             
-        pool:
-            column:   pool
+        field:
+            column:   field
+            type:     string
+            length:   40
+            nullable: true
+            
+        levelKey:
+            column:   levelKey
+            type:     string
+            length:   80
+            nullable: true
+            
+        groupKey:
+            column:   groupKey
+            type:     string
+            length:   40
+            nullable: true
+            
+        groupType:
+            column:   groupType
             type:     string
             length:   20
             nullable: true
+            
+        dtBeg:
+            column:   dtBeg
+            type:     datetime
+            nullable: false
+            
+        dtEnd:
+            column:   dtEnd
+            type:     datetime
+            nullable: true      # Maybe a TBD or BYE flag?
             
         link:
             column:   link
             type:     integer
             nullable: true
-            
-        dtBeg:
-            column:   dt_beg
-            type:     datetime
-            nullable: false
-            
-        dtEnd:
-            column:   dt_end
-            type:     datetime
-            nullable: true      # Maybe a TBD or BYE flag?
             
         status:
             column:   status
@@ -83,15 +101,4 @@ Cerad\Bundle\GameBundle\Entity\Game:
             length:   20
             nullable: false
 
-        levelId:
-            column:   level_id
-            type:     string
-            length:   80
-            nullable: true
-            
-        field:
-            column:   field
-            type:     string
-            length:   40
-            nullable: true
             

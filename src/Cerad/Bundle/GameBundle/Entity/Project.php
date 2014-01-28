@@ -1,9 +1,25 @@
 <?php
 namespace Cerad\Bundle\GameBundle\Entity;
-
+/*
+CREATE TABLE projects (
+ * id VARCHAR(80) NOT NULL, 
+ * name VARCHAR(80) DEFAULT NULL, 
+ * season VARCHAR(20) NOT NULL, 
+ * sport VARCHAR(20) NOT NULL, 
+ * domain VARCHAR(20) NOT NULL, 
+ * domainSub VARCHAR(40) NOT NULL, 
+ * status VARCHAR(20) DEFAULT NULL, 
+ * INDEX project_season_index (season), 
+ * INDEX project_sport_index (sport), 
+ * INDEX project_domain_index (domain), 
+ * INDEX project_domain_sub_index (domainSub), 
+ * PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
+ * 
+ */
 class Project extends AbstractEntity
 {
-    protected $id;
+    protected $key;
+    protected $name;
     
     protected $status = 'Active';
      
@@ -13,7 +29,7 @@ class Project extends AbstractEntity
     protected $domain;
     protected $domainSub;
    
-    public function getId() { return $this->id; }
+    public function getKey() { return $this->key; }
     
     public function getSeason()    { return $this->season;  }
     public function getStatus()    { return $this->status;  }
@@ -22,7 +38,7 @@ class Project extends AbstractEntity
     public function getDomain()    { return $this->domain; }
     public function getDomainSub() { return $this->domainSub; }
     
-    public function setId       ($value) { $this->onPropertySet('id',       $value); }
+    public function setKey      ($value) { $this->onPropertySet('key',      $value); }
     public function setSeason   ($value) { $this->onPropertySet('season',   $value); }
     public function setStatus   ($value) { $this->onPropertySet('status',   $value); }
     
@@ -41,7 +57,7 @@ class Project extends AbstractEntity
             $this->domain,
             $this->domainSub,
             $this->season,
-            $this->id
+            $this->key
         );
     }
 }

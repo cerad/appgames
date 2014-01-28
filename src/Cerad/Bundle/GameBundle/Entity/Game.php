@@ -15,14 +15,17 @@ class Game extends AbstractEntity
     
     protected $num;   // Unique within project
     protected $role = self::RoleGame;
-    protected $pool;
+    
+    protected $groupKey;
+    protected $groupType;
+    
     protected $link;   // Maybe to link crews?
     
     protected $dtBeg; // DateTime begin
     protected $dtEnd; // DateTime end
     
-    protected $levelId;
-    protected $projectId;
+    protected $levelKey;
+    protected $projectKey;
     
     protected $field;
     
@@ -41,8 +44,8 @@ class Game extends AbstractEntity
     public function getDtEnd()   { return $this->dtEnd;   }
     public function getStatus()  { return $this->status;  }
     
-    public function getLevelId()   { return $this->levelId;   }
-    public function getProjectId() { return $this->projectId; }
+    public function getLevelKey()   { return $this->levelKey;   }
+    public function getProjectKey() { return $this->projectKey; }
     
     public function setNum      ($value) { $this->onPropertySet('num',      $value); }
     public function setLink     ($value) { $this->onPropertySet('link',     $value); }
@@ -53,8 +56,8 @@ class Game extends AbstractEntity
     public function setDtEnd    ($value) { $this->onPropertySet('dtEnd',    $value); }
     public function setStatus   ($value) { $this->onPropertySet('status',   $value); }
     
-    public function setLevelId  ($value) { $this->onPropertySet('levelId',  $value); }
-    public function setProjectId($value) { $this->onPropertySet('projectId',$value); }
+    public function setLevelKey  ($value) { $this->onPropertySet('levelKey',  $value); }
+    public function setProjectKey($value) { $this->onPropertySet('projectKey',$value); }
     
     /* =======================================
      * Create factory
@@ -140,7 +143,7 @@ class Game extends AbstractEntity
             $this->status,
             $this->role,
             $this->num,
-            $this->projectId,
+            $this->projectKey,
             $this->dtBeg->format('d M Y H:i:s A'),
             $this->level->getDomainSub(),
             $this->level->getName(),

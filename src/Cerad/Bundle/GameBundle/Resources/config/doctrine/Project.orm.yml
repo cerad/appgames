@@ -12,21 +12,27 @@ Cerad\Bundle\GameBundle\Entity\Project:
        project_domain_index:
            columns: domain
        project_domain_sub_index:
-           columns: domain_sub
+           columns: domainSub
         
     id:
-        id:
-            type: string
+        key:
+            column: id
+            type:   string
             length: 80
             generator: { strategy: NONE }
     
     fields:
+        name:
+            column:   name
+            type:     string
+            length:   80
+            nullable: true
+            
         season:
             column:   season
             type:     string
             length:   20
             nullable: false
-            indexed:    true
             
         sport:
             column:   sport
@@ -41,9 +47,9 @@ Cerad\Bundle\GameBundle\Entity\Project:
             nullable: false
             
         domainSub:
-            column:   domain_sub
+            column:   domainSub
             type:     string
-            length:   20
+            length:   40
             nullable: false
             
         status:

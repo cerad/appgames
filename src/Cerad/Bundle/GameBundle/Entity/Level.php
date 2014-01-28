@@ -25,14 +25,14 @@ V4Level: Active   SOCCERNASOAMSSLMSG        Soccer   NASOA    MSSL       MS-G
  */
 class Level extends AbstractEntity
 {
-    protected $id;
+    protected $key;
     
     protected $name;
     protected $sport;
     protected $domain;
     protected $domainSub;
     
-    protected $div;
+    protected $program; // Core/Extra/Regional/Premier etc
     protected $age;
     protected $gender;
     
@@ -40,7 +40,7 @@ class Level extends AbstractEntity
     
     protected $link;   // Future, allow linking the same level across multiple domains
     
-    public function getId()        { return $this->id;     }
+    public function getKey()       { return $this->key;    }
     public function getName()      { return $this->name;   }
     public function getLink()      { return $this->link;   }
     public function getStatus()    { return $this->status; }
@@ -49,7 +49,7 @@ class Level extends AbstractEntity
     public function getDomain()    { return $this->domain; }
     public function getDomainSub() { return $this->domainSub; }
     
-    public function setId       ($value) { $this->onPropertySet('id',       $value); }
+    public function setKey      ($value) { $this->onPropertySet('key',      $value); }
     public function setName     ($value) { $this->onPropertySet('name',     $value); }
     public function setLink     ($value) { $this->onPropertySet('link',     $value); }
     public function setStatus   ($value) { $this->onPropertySet('status',   $value); }

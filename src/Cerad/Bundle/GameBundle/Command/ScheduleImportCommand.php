@@ -15,7 +15,7 @@ class ScheduleImportCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName       ('cerad:schedule:import')
+            ->setName       ('app_games:import:schedule')
             ->setDescription('Schedule Import')
             ->addArgument   ('importFile', InputArgument::REQUIRED, 'Import File')
             ->addArgument   ('truncate',   InputArgument::OPTIONAL, 'Truncate')
@@ -25,17 +25,20 @@ class ScheduleImportCommand extends ContainerAwareCommand
     protected function getParameter($name) { return $this->getContainer()->getParameter($name); }
     
     protected function execute(InputInterface $input, OutputInterface $output)
-    {
+    {   
+      //echo sprintf("%d\n",\PDO::ATTR_EMULATE_PREPARES); die();
+        
         $importFile = $input->getArgument('importFile');
         $truncate   = $input->getArgument('truncate');
         
         if ($truncate) $truncate = true;
         
         $this->loadFile($importFile,$truncate);
-
     }
     /* =========================================================
      * gws/TEST_Fall2013_GamesWithSlots_20130917.xml
+     * 
+     * ALYS_20131218_Fall2013_GamesWithSlots
      * 
      * pathInfo
      *  [dirname]   => gws
@@ -51,12 +54,8 @@ class ScheduleImportCommand extends ContainerAwareCommand
      */
     protected function loadFile($filePath, $truncate)
     {   
-        // Add in default directory and make sure it exists
-        $datax  = $this->getParameter('cerad_datax');
-        
-        $filePath = $datax . $filePath;
-        
-        if (!file_exists($filePath)) 
+        // Make sure file can be read
+        if (!is_readable($filePath)) 
         {
             echo sprintf("*** File does not exist: %s\n",$filePath);
             return;
@@ -80,16 +79,18 @@ class ScheduleImportCommand extends ContainerAwareCommand
         
         $params['sport']  = 'Soccer';
         $params['domain'] = $parts[0];
-        $params['season'] = $parts[1];
-        $params['format'] = $parts[2];
-        $params['suffix'] = $parts[3];
+        $params['season'] = $parts[2];
+        $params['format'] = $parts[3];
+        $params['date']   = $parts[1];
         
-        $importServiceId = sprintf('cerad_game.schedule_Arbiter%s.import',$params['format']);
+        $params['truncate'] = $truncate;
+        
+        $importServiceId = sprintf('cerad_game.schedule_Arbiter%s.import_pdo',$params['format']);
         $importService = $this->getService($importServiceId);
         
-        $results = $importService->import($params);
+        $results = $importService->process($params);
         
-        print_r($results);
+        echo $results;
         
     }
 }

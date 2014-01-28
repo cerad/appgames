@@ -5,16 +5,17 @@ Cerad\Bundle\GameBundle\Entity\Level:
     changeTrackingPolicy: NOTIFY
     
     indexes:
-       project_sport_index:
+       level_sport_index:
            columns: sport
-       project_domain_index:
+       level_domain_index:
            columns: domain
-       project_domain_sub_index:
-           columns: domain_sub
+       level_domain_sub_index:
+           columns: domainSub
         
     id:
-        id:
-            type: string
+        key:
+            column: id
+            type:   string
             length: 80
             generator: { strategy: NONE }
     
@@ -22,25 +23,25 @@ Cerad\Bundle\GameBundle\Entity\Level:
         name:
             column:   name
             type:     string
-            length:   20
+            length:   40
             nullable: false
             
-        div:
-            column:   divx   # Reserves word
+        program:
+            column:   program   # Reserves word
             type:     string
-            length:   8
+            length:   20
             nullable: true
             
         age:
             column:   age
             type:     string
-            length:   8
+            length:   20
             nullable: true
             
         gender:
-            column:   sex
+            column:   gender
             type:     string
-            length:   8
+            length:   20
             nullable: true
             
         link:
@@ -61,9 +62,9 @@ Cerad\Bundle\GameBundle\Entity\Level:
             nullable: false
             
         domainSub:
-            column:   domain_sub
+            column:   domainSub
             type:     string
-            length:   20
+            length:   40
             nullable: false
             
         status:

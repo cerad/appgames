@@ -1,10 +1,20 @@
 <?php
 namespace Cerad\Bundle\GameBundle\Schedule\Import;
 
-class Results
-{
-    
-}
+/* ===================================================
+ * Clean database
+ * $ ./console app_games:import:schedule data/ALYS_20131218_Fall2013_GamesWithSlots.xml
+   Arbiter Import  ALYS_20131218_Fall2013_GamesWithSlots.xml
+   Games Total 3314, Insert 3297, Update 0
+   Duration 10.94 83.36M
+ * 
+ * Existing database no updates
+ * Arbiter Import  ALYS_20131218_Fall2013_GamesWithSlots.xml
+   Games Total 3314, Insert 0, Update 0
+   Duration 5.57 63.44M
+ * 
+ * Wonder why I had trouble on zayso doing a complete import?
+ */
 class ArbiterGamesWithSlotsImport
 {
     protected $results;
@@ -20,6 +30,8 @@ class ArbiterGamesWithSlotsImport
     
     public function __construct($projectRepo,$levelRepo,$gameRepo)
     {
+        $this->results = new ArbiterImportResults();
+        
         $this->gameRepo    = $gameRepo;
         $this->levelRepo   = $levelRepo;
         $this->projectRepo = $projectRepo;
@@ -124,6 +136,8 @@ class ArbiterGamesWithSlotsImport
             $game = $gameRepo->createGame();
             $game->setProjectId($project->getId());
             $game->setNum($num);
+            
+            $this->results->countGamesInsert++;
         }
         $game->setField  ($row['site' ]);
         $game->setLevelId($level->getId());
@@ -163,7 +177,7 @@ class ArbiterGamesWithSlotsImport
     /* ===============================================================
      * Starts everything off
      */
-    public function import($params)
+    public function process($params)
     {
         // Save some
         $this->sport  = $params['sport'];
@@ -172,9 +186,10 @@ class ArbiterGamesWithSlotsImport
         $this->nums = array();
         
         // Setup results collector
-        $this->results = $results = new Results();
+        $results = $this->results;
+        $results->filepath = $params['filepath'];
         $results->basename = $params['basename'];
-        $results->totalGamesCount = 0;
+        $results->countGamesTotal = 0;
         
         // Must be a report file
         $reader = new \XMLReader();
@@ -212,7 +227,7 @@ class ArbiterGamesWithSlotsImport
             {
                 $row[$key] = $reader->getAttribute($attr);
             }
-            $results->totalGamesCount++;
+            $results->countGamesTotal++;
             
             $this->processRow($row);
 

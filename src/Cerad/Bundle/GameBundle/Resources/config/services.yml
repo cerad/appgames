@@ -1,6 +1,19 @@
 services:
 
 # =============================================================
+# PDO - Just for grins
+    pdo:
+        class: PDO
+        arguments:
+            dsn:      '%database_dsn%'
+            user:     '%database_user%'
+            password: '%database_password%'
+        calls:
+            - [setAttribute, [ 3, 2]] # \PDO::ATTR_ERRMODE,           \PDO::ERRMODE_EXCEPTION
+            - [setAttribute, [19, 2]] # \PDO::ATTR_DEFAULT_FETCH_MODE \PDO::FETCH_ASSOC
+            - [setAttribute, [20, 0]] # \PDO::ATTR_EMULATE_PREPARES
+
+# =============================================================
 # Project stuff
 
     cerad_project.entity_manager.doctrine:
@@ -56,6 +69,16 @@ services:
             - '@cerad_project.project_repository'
             - '@cerad_level.level_repository'
             - '@cerad_game.game_repository'
+            
+    cerad_game.schedule_ArbiterGamesWithSlots.import_pdo:
+        class: Cerad\Bundle\GameBundle\Schedule\Import\ArbiterGamesWithSlotsImportPDO
+        arguments:
+            - '@cerad_game.schedule_ArbiterGames.import_pdo_helper'
+            
+    cerad_game.schedule_ArbiterGames.import_pdo_helper:
+        class: Cerad\Bundle\GameBundle\Schedule\Import\ArbiterGamesImportHelper
+        arguments:
+            - '@pdo'
             
     cerad_game.twig_extension:
         class:  Cerad\Bundle\GameBundle\TwigExtension\GameExtension
