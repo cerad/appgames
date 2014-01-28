@@ -155,25 +155,37 @@ class ArbiterGamesWithSlotsImportPDO
         }
         // Index by slot?
         return $items;
-        
     }
-    protected function queryGameTeamHome($gameId)
+   protected function queryGameOfficials($gameId)
     {
-        $stmt = $this->helper->gameTeamHomeSelectStatement;
+        $items = array();
+        
+        $stmt = $this->helper->prepareGameOfficialsSelect();
         $stmt->execute(array('gameId' => $gameId));
         
         $rows = $stmt->fetchAll();
         
-        return count($rows) ? $rows[0] : null;
+        foreach($rows as $row)
+        {
+            $items[$row['slot']] = $row;
+        }
+        return $items;
     }
-    protected function queryGameTeamAway($gameId)
+    protected function insertGameOfficial($gameId,$slot,$role,$name,$state = 'Imported')
     {
-        $stmt = $this->helper->gameTeamAwaySelectStatement;
-        $stmt->execute(array('gameId' => $gameId));
+        if (!$role || substr($role,0,3) == 'No ') return;
         
-        $rows = $stmt->fetchAll();
+        if (!$name) $state = 'Open';
         
-        return count($rows) ? $rows[0] : null;
+        $params = array
+        (
+            'gameId' => $gameId,
+            'slot'   => $slot,
+            'role'   => $role,
+            'state'  => $state,
+            'personNameFull' => $name,
+        );
+        $this->helper->prepareGameOfficialInsert()->execute($params);
     }
     protected function insertGame($projectKey,$num,$levelKey,$row)
     {
@@ -191,6 +203,7 @@ class ArbiterGamesWithSlotsImportPDO
         
         $gameId = $this->helper->lastInsertId();
         
+        // Insert Teams
         $gameTeamParams = array
         (
             'gameId'   => $gameId,
@@ -205,6 +218,12 @@ class ArbiterGamesWithSlotsImportPDO
         $this->helper->gameTeamAwayInsertStatement->execute($gameTeamParams);
         
         $this->results->countGamesInsert++;
+        
+        // Insert Officials
+        for($slot = 1; $slot <= 5; $slot++)
+        {
+            $this->insertGameOfficial($gameId,$slot,$row['officialRole' . $slot],$row['officialName' . $slot]);
+        }
     }
     protected function updateGame($levelKey,$game,$row)
     {
@@ -238,6 +257,24 @@ class ArbiterGamesWithSlotsImportPDO
         }
         return $gameTeam;
     }
+    protected function processProjectTeam($projectKey,$levelKey,$name)
+    {
+        // See if one exists
+        $params = array
+        (
+            'projectKey' => $projectKey,
+            'levelKey'   => $levelKey,
+            'name'       => $name,
+        );
+        $selectStmt = $this->helper->prepareProjectTeamSelect();
+        $selectStmt->execute($params);
+        $rows = $selectStmt->fetchAll();
+        if (count($rows)) return;
+        
+        // Insert it
+        $this->helper->prepareProjectTeamInsert()->execute($params);
+        $this->results->countProjectTeamsInsert++;
+    }
     /* ==================================================
      * Handles one row at a time
      */
@@ -265,6 +302,10 @@ class ArbiterGamesWithSlotsImportPDO
         $projectKey = $this->processProject($row);
         $levelKey   = $this->processLevel  ($row);
        
+        // Process the project teams
+        $this->processProjectTeam($projectKey,$levelKey,$row['homeTeamName']);
+        $this->processProjectTeam($projectKey,$levelKey,$row['awayTeamName']);
+        
         // Query game
         $game = $this->queryGame($projectKey,$num);
         if (!$game) return $this->insertGame($projectKey,$num,$levelKey,$row);
@@ -272,12 +313,15 @@ class ArbiterGamesWithSlotsImportPDO
         // See if game needs updating
         $this->updateGame($levelKey,$game,$row);
         
-        // Query home team
+        // Update Game Teams
         $gameId = $game['id'];
         $gameTeams = $this->queryGameTeams($gameId);
 
         $this->updateGameTeam($levelKey,$gameTeams[1],$row['homeTeamName'],$row['homeTeamScore']);
         $this->updateGameTeam($levelKey,$gameTeams[2],$row['awayTeamName'],$row['awayTeamScore']);
+        
+        // Update game officials - tricky
+        $gameOfficials = $this->queryGameOfficials($gameId);
         
         return;
     }

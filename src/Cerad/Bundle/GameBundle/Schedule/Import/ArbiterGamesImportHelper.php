@@ -11,6 +11,7 @@ namespace Cerad\Bundle\GameBundle\Schedule\Import;
 class ArbiterGamesImportHelper
 {
     protected $conn;
+    protected $prepared = array();
     
     public $projectSelectStatement;
     public $projectInsertStatement;
@@ -27,7 +28,7 @@ class ArbiterGamesImportHelper
     public $gameTeamInsertStatement;
     public $gameTeamHomeInsertStatement;
     public $gameTeamAwayInsertStatement;
-    
+
     public function __construct($conn)
     {
         $this->conn = $conn;
@@ -48,6 +49,7 @@ class ArbiterGamesImportHelper
         
         $this->prepareGameTeamHomeInsert($conn);
         $this->prepareGameTeamAwayInsert($conn);
+        
     }
     public function commit          () { return $this->conn->commit();           }
     public function rollBack        () { return $this->conn->rollBack();         }
@@ -192,6 +194,81 @@ VALUES (:gameId,    2,'Away',:levelKey,:name,:score,'Active')
 ;
 EOT;
         $this->gameTeamAwayInsertStatement = $conn->prepare($sql);
+    }
+    /* ==================================================
+     * Project Teams
+     */
+    public function prepareProjectTeamSelect()
+    {
+        $key = 'projectTeamSelect';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+                
+        $sql = <<<EOT
+SELECT
+    team.id   AS id,
+    team.name AS name
+FROM  
+    project_teams AS team
+WHERE 
+    team.projectKey = :projectKey AND
+    team.levelKey   = :levelKey   AND
+    team.name       = :name
+;
+EOT;
+        return $this->prepared[$key] = $this->conn->prepare($sql);
+    }
+    public function prepareProjectTeamInsert()
+    {
+        $key = 'projectTeamInsert';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+                        
+        $sql = <<<EOT
+INSERT INTO project_teams
+       ( projectKey, levelKey, role,      name)
+VALUES (:projectKey,:levelKey,'Physical',:name)
+;
+EOT;
+        return $this->prepared[$key] = $this->conn->prepare($sql);
+    }
+    /* ==================================================
+     * Game Officials
+     */
+    public function prepareGameOfficialsSelect()
+    {
+        $key = 'gameOfficialsSelect';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+                
+        $sql = <<<EOT
+SELECT
+    official.id    AS id,
+    official.slot  AS slot,
+    official.role  AS role,
+    official.state AS state,
+    official.personNameFull AS personNameFull
+FROM  
+    game_officials AS official
+WHERE 
+    official.gameId = :gameId
+;
+EOT;
+        return $this->prepared[$key] = $this->conn->prepare($sql);
+    }
+    public function prepareGameOfficialInsert()
+    {
+        $key = 'gameOfficialInsert';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+                        
+        $sql = <<<EOT
+INSERT INTO game_officials
+       ( gameId, slot, role, personNameFull, state)
+VALUES (:gameId,:slot,:role,:personNameFull,:state)
+;
+EOT;
+        return $this->prepared[$key] = $this->conn->prepare($sql);
     }
 }
 ?>

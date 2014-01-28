@@ -32,7 +32,7 @@ class Game extends AbstractEntity
     protected $status;
     
     protected $teams;
-    protected $persons;
+    protected $officials;
     
     public function getId()      { return $this->id;      }
     public function getNum()     { return $this->num;     }
