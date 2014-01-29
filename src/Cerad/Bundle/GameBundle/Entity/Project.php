@@ -29,7 +29,8 @@ class Project extends AbstractEntity
     protected $domain;
     protected $domainSub;
    
-    public function getKey() { return $this->key; }
+    public function getKey()  { return $this->key;  }
+    public function getName() { return $this->name; }
     
     public function getSeason()    { return $this->season;  }
     public function getStatus()    { return $this->status;  }
@@ -38,13 +39,14 @@ class Project extends AbstractEntity
     public function getDomain()    { return $this->domain; }
     public function getDomainSub() { return $this->domainSub; }
     
-    public function setKey      ($value) { $this->onPropertySet('key',      $value); }
-    public function setSeason   ($value) { $this->onPropertySet('season',   $value); }
-    public function setStatus   ($value) { $this->onPropertySet('status',   $value); }
+    public function setKey      ($value) { $this->key    = $value; }
+    public function setName     ($value) { $this->name   = $value; }
+    public function setSeason   ($value) { $this->season = $value; }
+    public function setStatus   ($value) { $this->status = $value; }
     
-    public function setSport    ($value) { $this->onPropertySet('sport',    $value); }
-    public function setDomain   ($value) { $this->onPropertySet('domain',   $value); }
-    public function setDomainSub($value) { $this->onPropertySet('domainSub',$value); }
+    public function setSport    ($value) { $this->sport     = $value; }
+    public function setDomain   ($value) { $this->domain    = $value; }
+    public function setDomainSub($value) { $this->domainSub = $value; }
     
     /* =========================================
      * Debugging

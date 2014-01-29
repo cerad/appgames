@@ -1,6 +1,6 @@
 <?php
 
-namespace Cerad\Bundle\GameBundle\Entity;
+namespace Cerad\Bundle\GameBundle\EntityRepository;
 
 use Doctrine\ORM\EntityRepository;
 
@@ -18,38 +18,15 @@ class ProjectRepository extends EntityRepository
     {
         return $id ? parent::find($id) : null;
     }
-    public function findByFed($id)
-    {
-        if (!$id) return null;
-        
-        $repo = $this->_em->getRepository('CeradPersonBundle:PersonFed');
-        
-        $fed = $repo->find($id); 
-        
-        if ($fed) return $fed->getPerson();
-        
-        return null;
-    }
     /* ==========================================================
      * Persistence
      */
-    public function save($entity)
-    {
-        if ($entity instanceof ProjectEntity) 
-        {
-            $em = $this->getEntityManager();
-
-            return $em->persist($entity);
-        }
-        throw new \Exception('Wrong type of entity for save');
-    }
-    public function commit()
-    {
-       $em = $this->getEntityManager();
-       return $em->flush();
-    }
+    public function save($entity) { return $this->getEntityManager()->persist($entity); }
+    public function commit()      { return $this->getEntityManager()->flush();          }
+    
     /* ====================================================
      * Hashes up array values
+     * Keep for now but it really should only be used by the sync routines
      */
     public function hash($value)
     {
@@ -61,14 +38,14 @@ class ProjectRepository extends EntityRepository
             // Trim and cat
             array_walk($array, function($val) use (&$value) { $value .= trim($val); });
         }
-        $value = strtoupper(str_replace(array(' ','~','-'),'',$value));
+        $value = strtoupper(str_replace(array(' ','~','-',"'"),'',$value));
         
-        return $value;    
+        return $value;
     }
     /* ================================================
      * Return a list of project ids
      */
-    public function queryProjectIds($criteria = array())
+    public function queryProjectKeys($criteria = array())
     {
         $seasons    = $this->getArrayValue($criteria,'seasons'   );
         $sports     = $this->getArrayValue($criteria,'sports'    );
@@ -78,7 +55,7 @@ class ProjectRepository extends EntityRepository
         // Build query
         $qb = $this->createQueryBuilder('project');
 
-        $qb->select('project.id');
+        $qb->select('project.key');
         
         if ($seasons)
         {
@@ -102,12 +79,12 @@ class ProjectRepository extends EntityRepository
         }
         $items = $qb->getQuery()->getArrayResult();
         
-        $ids = array();
+        $keys = array();
         foreach($items as $item)
         {
-            $ids[] = $item['id'];
+            $keys[] = $item['key'];
         }
-        return $ids;
+        return $keys;
     }
     /* -----------------------------------------------------
      * Load a set of domains

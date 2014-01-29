@@ -5,7 +5,7 @@ services:
     pdo:
         class: PDO
         arguments:
-            dsn:      '%database_dsn%'
+            dsn:      '%database_dsn%'      # mysql:dbname=appgames
             user:     '%database_user%'
             password: '%database_password%'
         calls:

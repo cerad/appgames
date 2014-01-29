@@ -1,8 +1,7 @@
 Cerad\Bundle\GameBundle\Entity\Project:
     type:  entity
     table: projects
-    repositoryClass: Cerad\Bundle\GameBundle\Entity\ProjectRepository
-    changeTrackingPolicy: NOTIFY
+    repositoryClass: Cerad\Bundle\GameBundle\EntityRepository\ProjectRepository
     
     indexes:
        project_season_index:
