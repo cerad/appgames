@@ -13,7 +13,12 @@ class ArbiterImportResults
     public $countGamesInsert = 0;
     public $countGamesUpdate = 0;
     
-    public $countGameTeamsUpdate    = 0;
+    public $countGameTeamsInsert = 0;
+    public $countGameTeamsUpdate = 0;
+    
+    public $countGameOfficialsInsert = 0;
+    public $countGameOfficialsUpdate = 0;
+    public $countGameOfficialsDelete = 0;
     
     public $countProjectTeamsInsert = 0;
     
@@ -34,9 +39,10 @@ class ArbiterImportResults
 
         return  sprintf(
             "Arbiter Import %s %s\n" . 
-            "Games Total %d, Insert %d, Update %d\n" .
-            "Game    Teams Update: %d\n" .
-            "Project Teams Insert: %d\n" .
+            "Games Tot %4d Insert: %d, Update: %d\n" .
+            "Game Teams     Insert: %d, Update: %d\n" .
+            "Game Officials Insert: %d, Update: %d, Delete: %d\n" .
+            "Project  Teams Insert: %d\n" .
             "Duration %.2f %.2fM\n",
             $this->message,
             $this->basename,
@@ -45,7 +51,13 @@ class ArbiterImportResults
             $this->countGamesInsert,
             $this->countGamesUpdate,
                 
+            $this->countGameTeamsInsert,
             $this->countGameTeamsUpdate,
+                
+            $this->countGameOfficialsInsert,
+            $this->countGameOfficialsUpdate,
+            $this->countGameOfficialsDelete,
+                
             $this->countProjectTeamsInsert,
             
             $this->duration / 1000.,

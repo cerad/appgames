@@ -38,8 +38,6 @@ class ScheduleImportCommand extends ContainerAwareCommand
     /* =========================================================
      * gws/TEST_Fall2013_GamesWithSlots_20130917.xml
      * 
-     * ALYS_20131218_Fall2013_GamesWithSlots
-     * 
      * pathInfo
      *  [dirname]   => gws
      *  [basename]  => TEST_Fall2013_GamesWithSlots_20130917.xml
@@ -79,9 +77,9 @@ class ScheduleImportCommand extends ContainerAwareCommand
         
         $params['sport']  = 'Soccer';
         $params['domain'] = $parts[0];
-        $params['season'] = $parts[2];
-        $params['format'] = $parts[3];
-        $params['date']   = $parts[1];
+        $params['season'] = $parts[1];
+        $params['format'] = $parts[2];
+        $params['date']   = $parts[3];
         
         $params['truncate'] = $truncate;
         

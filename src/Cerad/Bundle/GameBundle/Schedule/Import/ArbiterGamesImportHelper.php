@@ -12,44 +12,10 @@ class ArbiterGamesImportHelper
 {
     protected $conn;
     protected $prepared = array();
-    
-    public $projectSelectStatement;
-    public $projectInsertStatement;
-    
-    public $levelSelectStatement;
-    public $levelInsertStatement;
-    
-    public $gameSelectStatement;
-    public $gameInsertStatement;
-    public $gameUpdateStatement;
-    
-    public $gameTeamsSelectStatement;
-    
-    public $gameTeamInsertStatement;
-    public $gameTeamHomeInsertStatement;
-    public $gameTeamAwayInsertStatement;
 
     public function __construct($conn)
     {
         $this->conn = $conn;
-        
-        $this->prepareProjectSelect($conn);
-        $this->prepareProjectInsert($conn);
-        
-        $this->prepareLevelSelect($conn);
-        $this->prepareLevelInsert($conn);
-        
-        $this->prepareGameSelect($conn);
-        $this->prepareGameInsert($conn);
-        $this->prepareGameUpdate($conn);
-        
-        $this->prepareGameTeamsSelect($conn);
-        
-        $this->prepareGameTeamUpdate($conn);
-        
-        $this->prepareGameTeamHomeInsert($conn);
-        $this->prepareGameTeamAwayInsert($conn);
-        
     }
     public function commit          () { return $this->conn->commit();           }
     public function rollBack        () { return $this->conn->rollBack();         }
@@ -59,51 +25,69 @@ class ArbiterGamesImportHelper
     /* ===============================================================
      * Project Code
      */
-    protected function prepareProjectSelect($conn)
+    public function prepareProjectSelect()
     {
+        $key = 'projectSelect';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+        
         $sql = <<<EOT
 SELECT id FROM projects WHERE id = :key;
 EOT;
-        $this->projectSelectStatement = $conn->prepare($sql);
+        return $this->prepared[$key] = $this->conn->prepare($sql);
     }
-    protected function prepareProjectInsert($conn)
+    public function prepareProjectInsert()
     {
+        $key = 'projectInsert';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+
         $sql = <<<EOT
 INSERT INTO projects
-( id, season, sport, domain, domainSub, status)
-VALUES
-(:key, :season, :sport, :domain, :domainSub, 'Active')
+       ( id,  season, sport, domain, domainSub, status)
+VALUES (:key,:season,:sport,:domain,:domainSub, 'Active')
 ;
 EOT;
-        $this->projectInsertStatement = $conn->prepare($sql);
+        return $this->prepared[$key] = $this->conn->prepare($sql);
     }
     /* ===============================================================
      * Level Code
      */
-    protected function prepareLevelSelect($conn)
+    public function prepareLevelSelect()
     {
+        $key = 'levelSelect';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+
         $sql = <<<EOT
 SELECT id FROM levels WHERE id = :key;
 EOT;
-        $this->levelSelectStatement = $conn->prepare($sql);
+        return $this->prepared[$key] = $this->conn->prepare($sql);
     }
-    protected function prepareLevelInsert($conn)
+    public function prepareLevelInsert()
     {
+        $key = 'levelInsert';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+        
         $sql = <<<EOT
 INSERT INTO levels
-( id, name, sport, domain, domainSub, status)
-VALUES
-(:key, :name, :sport, :domain, :domainSub, 'Active')
+       ( id,  name, sport, domain, domainSub, status)
+VALUES (:key,:name,:sport,:domain,:domainSub, 'Active')
 ;
 EOT;
-        $this->levelInsertStatement = $conn->prepare($sql);
+        return $this->prepared[$key] = $this->conn->prepare($sql);
     }
     /* ==================================================
      * Game Select,Insert,Update
      * Select matches Update
      */
-    protected function prepareGameSelect($conn)
+    public function prepareGameSelect()
     {
+        $key = 'gameSelect';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+        
         $sql = <<<EOT
 SELECT
     game.id        AS id,
@@ -115,38 +99,49 @@ SELECT
 FROM  games AS game
 WHERE game.projectKey = :projectKey AND game.num = :num;
 EOT;
-        $this->gameSelectStatement = $conn->prepare($sql);
+        return $this->prepared[$key] = $this->conn->prepare($sql);
     }
-    protected function prepareGameUpdate($conn)
+    public function prepareGameUpdate()
     {
+        $key = 'gameUpdate';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+        
         $sql = <<<EOT
 UPDATE games SET
-  field    = :field,
-  levelKey = :levelKey,
-  dtBeg    = :dtBeg,
-  dtEnd    = :dtEnd,
-  status   = :status
+    field    = :field,
+    levelKey = :levelKey,
+    dtBeg    = :dtBeg,
+    dtEnd    = :dtEnd,
+    status   = :status
 WHERE id = :id
 ;
 EOT;
-        $this->gameUpdateStatement = $conn->prepare($sql);
+        return $this->prepared[$key] = $this->conn->prepare($sql);
     }
-    protected function prepareGameInsert($conn)
+    public function prepareGameInsert()
     {
+        $key = 'gameInsert';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+        
         $sql = <<<EOT
 INSERT INTO games
-( projectKey, num, role, levelKey, field, dtBeg, dtEnd, status)
-VALUES
-(:projectKey,:num,'Game',:levelKey,:field,:dtBeg,:dtEnd,:status)
+       ( projectKey, num, role,  levelKey, field, dtBeg, dtEnd, status)
+VALUES (:projectKey,:num,'Game',:levelKey,:field,:dtBeg,:dtEnd,:status)
 ;
 EOT;
-        $this->gameInsertStatement = $conn->prepare($sql);
+        return $this->prepared[$key] = $this->conn->prepare($sql);
     }
     /* ==================================================
      * Game Teams
      */
-    protected function prepareGameTeamsSelect($conn)
+    public function prepareGameTeamsSelect()
     {
+        $key = 'gameTeamsSelect';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+        
         $sql = <<<EOT
 SELECT
     gameTeam.id       AS id,
@@ -159,10 +154,14 @@ FROM  game_teams AS gameTeam
 WHERE gameTeam.gameId = :gameId 
 ORDER BY gameTeam.slot;
 EOT;
-        $this->gameTeamsSelectStatement = $conn->prepare($sql);
+        return $this->prepared[$key] = $this->conn->prepare($sql);
     }
-    protected function prepareGameTeamUpdate($conn)
+    public function prepareGameTeamUpdate()
     {
+        $key = 'gameTeamUpdate';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+        
         $sql = <<<EOT
 UPDATE game_teams SET
     slot     = :slot,
@@ -172,28 +171,21 @@ UPDATE game_teams SET
     score    = :score
 WHERE id = :id
 EOT;
-        $this->gameTeamUpdateStatement = $conn->prepare($sql);
+        return $this->prepared[$key] = $this->conn->prepare($sql);
     }
-    protected function prepareGameTeamHomeInsert($conn)
+    public function prepareGameTeamInsert()
     {
+        $key = 'gameTeamInsert';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+        
         $sql = <<<EOT
 INSERT INTO game_teams
-( gameId, slot, role,  levelKey, name, score, status)
-VALUES
-(:gameId,    1,'Home',:levelKey,:name,:score,'Active')
+       ( gameId, slot, role, levelKey, name, score, status)
+VALUES (:gameId,:slot,:role,:levelKey,:name,:score,'Active')
 ;
 EOT;
-        $this->gameTeamHomeInsertStatement = $conn->prepare($sql);
-    }
-    protected function prepareGameTeamAwayInsert($conn)
-    {
-        $sql = <<<EOT
-INSERT INTO game_teams
-       ( gameId, slot, role,  levelKey, name, score, status)
-VALUES (:gameId,    2,'Away',:levelKey,:name,:score,'Active')
-;
-EOT;
-        $this->gameTeamAwayInsertStatement = $conn->prepare($sql);
+        return $this->prepared[$key] = $this->conn->prepare($sql);
     }
     /* ==================================================
      * Project Teams
@@ -247,7 +239,7 @@ SELECT
     official.slot  AS slot,
     official.role  AS role,
     official.state AS state,
-    official.personNameFull AS personNameFull
+    official.personNameFull AS name
 FROM  
     game_officials AS official
 WHERE 
@@ -256,16 +248,45 @@ WHERE
 EOT;
         return $this->prepared[$key] = $this->conn->prepare($sql);
     }
+    public function prepareGameOfficialUpdate()
+    {
+        $key = 'gameOfficialsUpdate';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+                
+        $sql = <<<EOT
+UPDATE game_officials SET
+    slot  = :slot,
+    role  = :role,
+    state = :state,
+    personNameFull = :name
+WHERE id = :id
+;
+EOT;
+        return $this->prepared[$key] = $this->conn->prepare($sql);
+    }
     public function prepareGameOfficialInsert()
     {
-        $key = 'gameOfficialInsert';
+        $key = 'gameOfficialsInsert';
+        
+        if (isset($this->prepared[$key])) return $this->prepared[$key];
+                
+        $sql = <<<EOT
+INSERT INTO game_officials
+      ( gameId, slot, role, state, personNameFull)
+VALUES(:gameId,:slot,:role,:state,:name)
+;
+EOT;
+        return $this->prepared[$key] = $this->conn->prepare($sql);
+    }
+    public function prepareGameOfficialDelete()
+    {
+        $key = 'gameOfficialDelete';
         
         if (isset($this->prepared[$key])) return $this->prepared[$key];
                         
         $sql = <<<EOT
-INSERT INTO game_officials
-       ( gameId, slot, role, personNameFull, state)
-VALUES (:gameId,:slot,:role,:personNameFull,:state)
+DELETE FROM game_officials WHERE id = :id
 ;
 EOT;
         return $this->prepared[$key] = $this->conn->prepare($sql);

@@ -27,6 +27,26 @@ namespace Cerad\Bundle\GameBundle\Schedule\Import;
  * Duration 14.57  8.65M Inserted game teams, less memory but much longer executation?
  * 
  * Duration  1.59  8.65M Wrap everything in a transaction and it flies
+Arbiter Import  ALYS_Fall2013_GamesWithSlots_20131218.xml
+Games Tot 3314 Insert: 3297, Update: 0
+Game Teams     Insert: 6594, Update: 0
+Game Officials Insert: 8001, Update: 0, Delete: 0
+Project  Teams Insert: 1894
+Duration 4.20 6.03M
+
+Arbiter Import  ALYS_Fall2013_GamesWithSlots_20131218.xml
+Games Tot 3314 Insert: 0, Update: 0
+Game Teams     Insert: 0, Update: 0
+Game Officials Insert: 0, Update: 0, Delete: 0
+Project  Teams Insert: 0
+Duration 1.98 6.03M
+ * 
+Arbiter Import  ALYS_Fall2013_GamesWithSlots_20131218.xml
+Games Tot 3314 Insert: 3297, Update: 0
+Game Teams     Insert: 6594, Update: 0
+Game Officials Insert: 8001, Update: 0, Delete: 0
+Project  Teams Insert: 1894
+Duration 3.90 6.03M
  */
 class ArbiterGamesWithSlotsImportPDO
 {
@@ -34,6 +54,10 @@ class ArbiterGamesWithSlotsImportPDO
     
     protected $results;
    
+    protected $sport;
+    protected $season;
+    protected $domain;
+    
     public function __construct($helper)
     {
         $this->helper = $helper;
@@ -64,7 +88,7 @@ class ArbiterGamesWithSlotsImportPDO
         
         $selectParams = array('key' => $projectKey);
         
-        $stmt = $this->helper->projectSelectStatement;
+        $stmt = $this->helper->prepareProjectSelect();
         $stmt->execute($selectParams);
         $rows = $stmt->fetchAll();
         
@@ -78,7 +102,7 @@ class ArbiterGamesWithSlotsImportPDO
             'domain'    => $row['domain'],
             'domainSub' => $row['domainSub'],
         );
-        $this->helper->projectInsertStatement->execute($insertParams);
+        $this->helper->prepareProjectInsert()->execute($insertParams);
         
         return $projectKey;        
     }
@@ -94,7 +118,7 @@ class ArbiterGamesWithSlotsImportPDO
         
         $selectParams = array('key' => $levelKey);
         
-        $stmt = $this->helper->levelSelectStatement;
+        $stmt = $this->helper->prepareLevelSelect();
         $stmt->execute($selectParams);
         $rows = $stmt->fetchAll();
         
@@ -108,32 +132,37 @@ class ArbiterGamesWithSlotsImportPDO
             'domain'    => $row['domain'],
             'domainSub' => $row['domainSub'],
         );
-        $this->helper->levelInsertStatement->execute($insertParams);
+        $this->helper->prepareLevelInsert()->execute($insertParams);
         
         return $levelKey;        
     }
-    /* =================================================================
-     * Misc
+    /* ============================================
+     * Project Teams
      */
-    protected function processGameTeamName($name)
+    protected function processProjectTeam($projectKey,$levelKey,$name)
     {
-        return $name ? $name : 'TBD';
+        // See if one exists
+        $params = array
+        (
+            'projectKey' => $projectKey,
+            'levelKey'   => $levelKey,
+            'name'       => $name,
+        );
+        $selectStmt = $this->helper->prepareProjectTeamSelect();
+        $selectStmt->execute($params);
+        $rows = $selectStmt->fetchAll();
+        if (count($rows)) return;
+        
+        // Insert it
+        $this->helper->prepareProjectTeamInsert()->execute($params);
+        $this->results->countProjectTeamsInsert++;
     }
-    protected function processGameTeamScore($gameReportStatus,$score)
-    {
-        // No report means no score
-        if ($gameReportStatus == 'No Report') return null;
-        
-        $score = (integer)$score;
-        
-        if (!$score) $score = 0; // PHP stripping away 0 strings
-        
-        return $score;
-    }
-    // Should this be in the helper?
+    /* =================================================================
+     * Queries
+     */
     protected function queryGame($projectKey,$num)
     {
-        $stmt = $this->helper->gameSelectStatement;
+        $stmt = $this->helper->prepareGameSelect();
         $stmt->execute(array('projectKey' => $projectKey, 'num' => $num));
         
         $rows = $stmt->fetchAll();
@@ -144,13 +173,13 @@ class ArbiterGamesWithSlotsImportPDO
     {
         $items = array();
         
-        $stmt = $this->helper->gameTeamsSelectStatement;
+        $stmt = $this->helper->prepareGameTeamsSelect();
         $stmt->execute(array('gameId' => $gameId));
         
         $rows = $stmt->fetchAll();
         
         foreach($rows as $row)
-        {
+        {   
             $items[$row['slot']] = $row;
         }
         // Index by slot?
@@ -171,22 +200,6 @@ class ArbiterGamesWithSlotsImportPDO
         }
         return $items;
     }
-    protected function insertGameOfficial($gameId,$slot,$role,$name,$state = 'Imported')
-    {
-        if (!$role || substr($role,0,3) == 'No ') return;
-        
-        if (!$name) $state = 'Open';
-        
-        $params = array
-        (
-            'gameId' => $gameId,
-            'slot'   => $slot,
-            'role'   => $role,
-            'state'  => $state,
-            'personNameFull' => $name,
-        );
-        $this->helper->prepareGameOfficialInsert()->execute($params);
-    }
     protected function insertGame($projectKey,$num,$levelKey,$row)
     {
         $gameParams = array
@@ -194,35 +207,31 @@ class ArbiterGamesWithSlotsImportPDO
             'projectKey' => $projectKey,
             'num'        => $num,
             'levelKey'   => $levelKey,
-            'field'      => $row['site'],
-            'dtBeg'      => $row['dtBeg'],
-            'dtEnd'      => $row['dtEnd'],
+            'field'      => $row['field' ],
+            'dtBeg'      => $row['dtBeg' ],
+            'dtEnd'      => $row['dtEnd' ],
             'status'     => $row['status'],
         );
-        $this->helper->gameInsertStatement->execute($gameParams);
+        $this->helper->prepareGameInsert()->execute($gameParams);
+        $this->results->countGamesInsert++;
         
         $gameId = $this->helper->lastInsertId();
         
-        // Insert Teams
-        $gameTeamParams = array
-        (
-            'gameId'   => $gameId,
-            'levelKey' => $levelKey,
-            'name'     => $row['homeTeamName' ],
-            'score'    => $row['homeTeamScore'],
-        );
-        $this->helper->gameTeamHomeInsertStatement->execute($gameTeamParams);
-       
-        $gameTeamParams['name']  = $row['awayTeamName' ];
-        $gameTeamParams['score'] = $row['awayTeamScore'];
-        $this->helper->gameTeamAwayInsertStatement->execute($gameTeamParams);
-        
-        $this->results->countGamesInsert++;
+        foreach($row['teams'] as $team)
+        {
+            $team['gameId']   = $gameId;
+            $team['levelKey'] = $levelKey;
+            
+            $this->helper->prepareGameTeamInsert()->execute($team);
+            $this->results->countGameTeamsInsert++;
+        }     
         
         // Insert Officials
-        for($slot = 1; $slot <= 5; $slot++)
+        foreach($row['officials'] as $official)
         {
-            $this->insertGameOfficial($gameId,$slot,$row['officialRole' . $slot],$row['officialName' . $slot]);
+            $official['gameId'] = $gameId;
+            $this->helper->prepareGameOfficialInsert()->execute($official);
+            $this->results->countGameOfficialsInsert++;
         }
     }
     protected function updateGame($levelKey,$game,$row)
@@ -230,106 +239,240 @@ class ArbiterGamesWithSlotsImportPDO
         // See if game needs updating
         $needUpdate = false;
         if ($game['levelKey'] != $levelKey)      { $game['levelKey'] = $levelKey;      $needUpdate = true; }
-        if ($game['field']    != $row['site'])   { $game['field']    = $row['site'];   $needUpdate = true; }
-        if ($game['dtBeg']    != $row['dtBeg'])  { $game['dtBeg']    = $row['dtBeg'];  $needUpdate = true; }
-        if ($game['dtEnd']    != $row['dtEnd'])  { $game['dtEnd']    = $row['dtEnd'];  $needUpdate = true; }
+        if ($game['field']    != $row['field' ]) { $game['field']    = $row['site'];   $needUpdate = true; }
+        if ($game['dtBeg']    != $row['dtBeg' ]) { $game['dtBeg']    = $row['dtBeg'];  $needUpdate = true; }
+        if ($game['dtEnd']    != $row['dtEnd' ]) { $game['dtEnd']    = $row['dtEnd'];  $needUpdate = true; }
         if ($game['status']   != $row['status']) { $game['status']   = $row['status']; $needUpdate = true; }
         
         if ($needUpdate)
         {
-            $this->helper->gameUpdateStatement->execute($game);
+            $this->helper->prepareGameUpdate()->execute($game);
             $this->results->countGamesUpdate++;
         }
         return $game;
     }
-    protected function updateGameTeam($levelKey,$gameTeam,$name,$score)
+    protected function updateGameTeam($levelKey,$gameTeam,$rowTeam)
     {
         // See if game needs updating
         $needUpdate = false;
-        if ($gameTeam['levelKey'] !=  $levelKey) { $gameTeam['levelKey'] = $levelKey; $needUpdate = true; }
-        if ($gameTeam['name']     !=  $name)     { $gameTeam['name']     = $name;     $needUpdate = true; }
-        if ($gameTeam['score']    !== $score)    { $gameTeam['score']    = $score;    $needUpdate = true; }
         
+        if ($gameTeam['levelKey'] != $levelKey) 
+        { 
+            $gameTeam['levelKey']  = $levelKey; 
+            $needUpdate = true;
+        }
+        if ($gameTeam['name'] != $rowTeam['name'])
+        { 
+            $gameTeam['name']  = $rowTeam['name'];
+            $needUpdate = true;
+        }
+        if ($gameTeam['score'] !== $rowTeam['score'])
+        { 
+            $gameTeam['score']   = $rowTeam['score'];
+            $needUpdate = true;  
+        }
         if ($needUpdate)
         {
-            $this->helper->gameTeamUpdateStatement->execute($gameTeam);
+            $this->helper->prepareGameTeamUpdate()->execute($gameTeam);
             $this->results->countGameTeamsUpdate++;
         }
         return $gameTeam;
     }
-    protected function processProjectTeam($projectKey,$levelKey,$name)
+    protected function updateGameOfficial($gameOfficial,$role,$name)
     {
-        // See if one exists
-        $params = array
-        (
-            'projectKey' => $projectKey,
-            'levelKey'   => $levelKey,
-            'name'       => $name,
-        );
-        $selectStmt = $this->helper->prepareProjectTeamSelect();
-        $selectStmt->execute($params);
-        $rows = $selectStmt->fetchAll();
-        if (count($rows)) return;
+        // See if official needs updating
+        $needUpdate = false;
         
-        // Insert it
-        $this->helper->prepareProjectTeamInsert()->execute($params);
-        $this->results->countProjectTeamsInsert++;
+        if ($gameOfficial['role'] != $role) { $gameOfficial['role'] = $role; $needUpdate = true; }
+        
+        if ($gameOfficial['name'] != $name)     
+        { 
+            $gameOfficial['name']  = $name;
+            $gameOfficial['state'] = null;
+            $needUpdate = true; 
+        }
+        if ($needUpdate)
+        {
+            $this->helper->prepareGameOfficialUpdate()->execute($gameOfficial);
+            $this->results->countGameOfficialsUpdate++;
+        }
+        return $gameOfficial;
     }
     /* ==================================================
-     * Handles one row at a time
+     * Ong game with normalized data
      */
     protected function processGame($row)
     {
-        // Process the game number
-        $num = (integer)$row['num'];
-        
-        // Probably toss an exception
+        // Sanity check
+        $num = $row['num'];
         if (!$num) return;
         
-        // Drop the T
-        $row['dtBeg'] = str_replace('T',' ',$row['dtBeg']);
-        $row['dtEnd'] = str_replace('T',' ',$row['dtEnd']);
-        
-        // Some teams have no name
-        $row['homeTeamName'] = $this->processGameTeamName($row['homeTeamName']);
-        $row['awayTeamName'] = $this->processGameTeamName($row['awayTeamName']);
-       
-        // Deal with null vs 0 scores
-        $row['homeTeamScore'] = $this->processGameTeamScore($row['gameReportStatus'],$row['homeTeamScore']);
-        $row['awayTeamScore'] = $this->processGameTeamScore($row['gameReportStatus'],$row['awayTeamScore']);
-
         // Get the project and level
         $projectKey = $this->processProject($row);
         $levelKey   = $this->processLevel  ($row);
        
         // Process the project teams
-        $this->processProjectTeam($projectKey,$levelKey,$row['homeTeamName']);
-        $this->processProjectTeam($projectKey,$levelKey,$row['awayTeamName']);
+        foreach($row['teams'] as $team)
+        {
+            $this->processProjectTeam($projectKey,$levelKey,$team['name']);
+        }
         
         // Query game
         $game = $this->queryGame($projectKey,$num);
         if (!$game) return $this->insertGame($projectKey,$num,$levelKey,$row);
-        
+
         // See if game needs updating
         $this->updateGame($levelKey,$game,$row);
         
         // Update Game Teams
         $gameId = $game['id'];
         $gameTeams = $this->queryGameTeams($gameId);
-
-        $this->updateGameTeam($levelKey,$gameTeams[1],$row['homeTeamName'],$row['homeTeamScore']);
-        $this->updateGameTeam($levelKey,$gameTeams[2],$row['awayTeamName'],$row['awayTeamScore']);
         
+        // Make make bidirectional like officials though number of teams and slots should never change
+        foreach($gameTeams as $gameTeam)
+        {
+            $slot = $gameTeam['slot'];
+            $this->updateGameTeam($levelKey,$gameTeam,$row['teams'][$slot]);
+        }
+
         // Update game officials - tricky
         $gameOfficials = $this->queryGameOfficials($gameId);
+        $rowOfficials  = $row['officials'];
         
+        foreach($rowOfficials as $rowOfficial)
+        {
+            $slot = $rowOfficial['slot'];
+            if (!isset($gameOfficials[$slot]))
+            {
+                // Insert new recprd
+                $rowOfficial['gameId'] = $gameId;
+                $this->helper->prepareGameOfficialInsert()->execute($rowOfficial);
+                $this->results->countGameOfficialsInsert++;
+            }
+            else
+            {
+                $this->updateGameOfficial($gameOfficials[$slot],$rowOfficial['role'],$rowOfficial['name']);
+            }
+        }
+        // Delete any existing records
+        foreach($gameOfficials as $gameOfficial)
+        {
+            $slot = $gameOfficial['slot'];
+            if (!isset($rowOfficials[$slot]))
+            {
+                $this->helper->prepareGameOfficialDelete()->execute(array('id' => $gameOfficial['id']));
+                $this->results->countGameOfficialsDelete++;
+            }
+        }
         return;
+    }
+    /* =================================================================
+     * Misc
+     */
+    protected function processGameTeamName($name)
+    {
+        return $name ? $name : 'TBD';
+    }
+    protected function processGameTeamScore($score,$gameReportStatus)
+    {
+        // No report means no score
+        if (!$gameReportStatus) return null;
+        
+        $score = (integer)$score;
+        
+        // PHP stripping away 0 strings
+        return $score ? $score : 0;
+    }
+    /* ===============================================================
+     * Does some cleanup and transformations
+     */
+    protected function processRow($row)
+    {
+        // Normalize report status
+        $gameReportStatus = $row['gameReportStatus'];
+        if ($gameReportStatus == 'No Report') $gameReportStatus = null;
+        
+        $rowx = array
+        (
+            'sport'  => $this->sport,
+            'season' => $this->season,
+            'domain' => $this->domain,
+            
+            'domainSub' => $row['domainSub'],
+            'level'     => $row['level'],
+            
+            'num'   => (int)$row['num'],
+            
+            'field'  => $row['site'],
+            'status' => $row['status'],
+            
+            'dtBeg' => str_replace('T',' ',$row['dtBeg']),
+            'dtEnd' => str_replace('T',' ',$row['dtEnd']),
+            
+            'gameReportStatus' => $gameReportStatus,
+        );
+        /* ======================================================
+         * Pull out teams
+         */
+        $homeTeam = array
+        (
+            'slot'  => 1,
+            'role'  => 'Home',
+            'name'  => $this->processGameTeamName ($row['homeTeamName']),
+            'score' => $this->processGameTeamScore($row['homeTeamScore'],$gameReportStatus),
+        );
+        $awayTeam = array
+        (
+            'slot'  => 2,
+            'role'  => 'Away',
+            'name'  => $this->processGameTeamName ($row['awayTeamName']),
+            'score' => $this->processGameTeamScore($row['awayTeamScore'],$gameReportStatus),
+        );
+        $rowx['teams'] = array(1 => $homeTeam, 2 => $awayTeam);
+        
+        /* =========================================================
+         * Pull out officials
+         */
+        $noRoles = array(
+            1 => 'No First Position',
+            2 => 'No Second Position',
+            3 => 'No Third Position',
+            4 => 'No Fourth Position',
+            5 => 'No Fifth Position'
+        );
+        $officials = array();
+        for($slot = 1; $slot <= 5; $slot++)
+        {
+            $roleIndex = 'officialRole' . $slot;
+            $nameIndex = 'officialName' . $slot;
+            
+            if ($row[$roleIndex] != $noRoles[$slot])
+            {
+                $name = $row[$nameIndex] != 'Empty' ? $row[$nameIndex] : null;
+                
+                $officials[$slot] = array
+                (
+                    'slot'  => $slot,
+                    'role'  => $row[$roleIndex],
+                    'name'  => $name,
+                    'state' => null,
+                );
+           }
+        }
+        $rowx['officials'] = $officials;
+        
+        return $this->processGame($rowx);
     }
     /* ===============================================================
      * Starts everything off
      */
     public function process($params)
-    {   
+    {
+        // These never change
+        $this->sport  = $params['sport'];
+        $this->season = $params['season'];
+        $this->domain = $params['domain'];
+ 
         // Setup results collector
         $results = $this->results;
         $results->filepath = $params['filepath'];
@@ -363,9 +506,9 @@ class ArbiterGamesWithSlotsImportPDO
         while($reader->name == 'Detail')
         {
             $row = array();
-            $row['sport']  = $params['sport'];
-            $row['domain'] = $params['domain'];
-            $row['season'] = $params['season'];
+          //$row['sport']  = $params['sport'];
+          //$row['domain'] = $params['domain'];
+          //$row['season'] = $params['season'];
         
             foreach($this->map as $key => $attr)
             {
@@ -373,7 +516,7 @@ class ArbiterGamesWithSlotsImportPDO
             }
             $results->countGamesTotal++;
             
-            $this->processGame($row);
+            $this->processRow($row);
 
             // On to the next one
             $reader->next('Detail');
@@ -384,6 +527,10 @@ class ArbiterGamesWithSlotsImportPDO
         $reader->close();
         return $results;
     }
+    /* ===========================================================
+     * xmlReader does not have a simple getAttributes command
+     * Could iterate over it but a map is prettly as fast
+     */
     protected $map = array
     (
         'num'           => 'GameID',
