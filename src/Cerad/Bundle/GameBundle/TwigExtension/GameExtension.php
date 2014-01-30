@@ -3,7 +3,6 @@ namespace Cerad\Bundle\GameBundle\TwigExtension;
 
 class GameExtension extends \Twig_Extension
 {
-    protected $env;
     protected $levelRepo;
     
     public function getName() { return 'cerad_game_extension'; }
@@ -12,30 +11,34 @@ class GameExtension extends \Twig_Extension
     {   
         $this->levelRepo = $levelRepo;        
     }
-    public function initRuntime(\Twig_Environment $env)
-    {
-        parent::initRuntime($env);
-        $this->env = $env;
-    }
-    protected function escape($string)
-    {
-        return twig_escape_filter($this->env,$string);
-    }
     public function getFunctions()
     {
-        return array(            
-            'cerad_level_find' => new \Twig_Function_Method($this, 'findLevel'),
-            'cerad_game_score' => new \Twig_Function_Method($this, 'gameScore'),
+        return array
+        (            
+            'cerad_level_find'             => new \Twig_Function_Method($this, 'findLevel'),
+            'cerad_game_score'             => new \Twig_Function_Method($this, 'gameScore'),
+            'cerad_game_officials_summary' => new \Twig_Function_Method($this, 'gameOfficialsSummary'),
         );
     }
     public function gameScore($score)
     {
-        if ($score === null) return '_:';
-        return $score . ':';
+        return ($score === null) ? '_:' : $score . ':';
     }
-    public function findLevel($levelId)
+    public function findLevel($levelKey)
     {
-        return $this->levelRepo->find($levelId);
+        return $this->levelRepo->find($levelKey);
     }
+    public function gameOfficialsSummary($game)
+    {
+        if ($game->getStatus() == 'Canceled') return ' ';
+        
+        $states = array();
+        $officials = $game->getOfficials();
+        foreach($officials as $official)
+        {
+            $states[] = $official->getPersonNameFull() ? 'A' : 'O';
+        }
+        return implode('-',$states);
+    }    
 }
 ?>

@@ -1,43 +1,18 @@
 <?php
-
-namespace Cerad\Bundle\GameBundle\Entity;
-
-use Doctrine\ORM\EntityRepository;
+namespace Cerad\Bundle\GameBundle\EntityRepository;
 
 use Cerad\Bundle\GameBundle\Entity\Game as GameEntity;
 
-class GameRepository extends EntityRepository
+class GameRepository extends AbstractRepository
 {   
     public function createGame($params = null) { return new GameEntity($params); }
 
     /* ==========================================================
      * Find stuff
      */
-    public function find($id)
+    public function findOneByProjectNum($projectKey,$num)
     {
-        return $id ? parent::find($id) : null;
-    }
-    public function findOneByProjectNum($projectId,$num)
-    {
-        return $this->findOneBy(array('projectId' => $projectId, 'num' => $num));    
-    }
-    /* ==========================================================
-     * Persistence
-     */
-    public function save($entity)
-    {
-        if ($entity instanceof GameEntity) 
-        {
-            $em = $this->getEntityManager();
-
-            return $em->persist($entity);
-        }
-        throw new \Exception('Wrong type of entity for save');
-    }
-    public function commit()
-    {
-       $em = $this->getEntityManager();
-       return $em->flush();
+        return $this->findOneBy(array('projectKey' => $projectKey, 'num' => $num));    
     }
     /* ========================================================
      * Generic schedule query
@@ -45,13 +20,13 @@ class GameRepository extends EntityRepository
      */
     public function queryGameSchedule($criteria)
     {
-        $nums       = $this->getArrayValue($criteria,'nums');
-        $levelIds   = $this->getArrayValue($criteria,'levelIds');
-        $projectIds = $this->getArrayValue($criteria,'projectIds');
+        $nums        = $this->getArrayValue($criteria,'nums');
+        $levelKeys   = $this->getArrayValue($criteria,'levelKeys');
+        $projectKeys = $this->getArrayValue($criteria,'projectKeys');
         
         $teamNames  = $this->getArrayValue($criteria,'teams');
         $fieldNames = $this->getArrayValue($criteria,'fields');
-        
+    
         /* =================================================
          * Dates are always so much fun
          */
@@ -87,20 +62,20 @@ class GameRepository extends EntityRepository
         $qb->select('distinct game.id');
         $qb->leftJoin ('game.teams','gameTeam');
         
-        if ($projectIds)
+        if ($projectKeys)
         {
-            $qb->andWhere('game.projectId IN (:projectIds)');
-            $qb->setParameter('projectIds',$projectIds);
+            $qb->andWhere('game.projectKey IN (:projectKeys)');
+            $qb->setParameter('projectKeys',$projectKeys);
         }
         if ($fieldNames)
         {
             $qb->andWhere('game.field IN (:fieldNames)');
             $qb->setParameter('fieldNames',$fieldNames);
         }
-        if ($levelIds)
+        if ($levelKeys)
         {
-            $qb->andWhere('gameTeam.levelId IN (:levelIds)');
-            $qb->setParameter('levelIds',$levelIds);
+            $qb->andWhere('gameTeam.levelKey IN (:levelKeys)');
+            $qb->setParameter('levelKeys',$levelKeys);
         }
         /* ============================================
          * This is what makes me grab gamesIds first
@@ -137,19 +112,18 @@ class GameRepository extends EntityRepository
             $qb->setParameter('nums',$criteria['nums']);
         }
       //echo $qb->getDql();
-        $gameIds = $qb->getQuery()->getArrayResult();
+        $gameIds = $qb->getQuery()->getScalarResult();
+        
         if (count($gameIds) < 1) return array();
         
         $ids = array();
-        foreach($gameIds as $gameId)
-        {
-            $ids[] = $gameId['id'];
-        }
+        array_walk($gameIds, function($row) use (&$ids) { $ids[] = $row['id']; });
         
         // Game query
         $qbx = $this->createQueryBuilder('game');
-        $qbx->addSelect('gameTeam');
-        $qbx->leftJoin ('game.teams','gameTeam');
+        $qbx->addSelect('gameTeam,gameOfficial');
+        $qbx->leftJoin ('game.teams',    'gameTeam');
+        $qbx->leftJoin ('game.officials','gameOfficial');
         $qbx->andWhere ('game.id IN (:ids)');
         $qbx->setParameter('ids',$ids);
         
@@ -158,7 +132,6 @@ class GameRepository extends EntityRepository
 
         $qbx->addOrderBy('game.dtBeg');
 
-        
         return $qbx->getQuery()->getResult();
     }
     /* ========================================================
@@ -166,27 +139,26 @@ class GameRepository extends EntityRepository
      */
     public function queryFieldChoices($criteria = array())
     {
-        $projectIds = $this->getArrayValue($criteria,'projectIds');
+        $projectKeys = $this->getArrayValue($criteria,'projectKeys');
         
         // Build query
         $qb = $this->createQueryBuilder('game');
         
         $qb->select('distinct game.field');
         
-        if ($projectIds)
+        if ($projectKeys)
         {
-            $qb->andWhere('game.projectId IN (:projectIds)');
-            $qb->setParameter('projectIds',$projectIds);
+            $qb->andWhere('game.projectKey IN (:projectKeys)');
+            $qb->setParameter('projectKeys',$projectKeys);
         }
         $qb->addOrderBy('game.field');
        
-        $items = $qb->getQuery()->getArrayResult();
+        $rows = $qb->getQuery()->getScalarResult();
         
         $choices = array();
-        foreach($items as $item)
-        {
-            $choices[$item['field']] = $item['field'];
-        }
+        
+        array_walk($rows, function($row) use (&$choices) { $choices[$row['field']] = $row['field']; });
+        
         return $choices;
     }
     /* ========================================================
@@ -194,9 +166,9 @@ class GameRepository extends EntityRepository
      */
     public function queryTeamChoices($criteria = array())
     {
-        $levelIds   = $this->getArrayValue($criteria,'levelIds');
-        $projectIds = $this->getArrayValue($criteria,'projectIds');
-        
+        $levelKeys   = $this->getArrayValue($criteria,'levelKeys');
+        $projectKeys = $this->getArrayValue($criteria,'projectKeys');
+
         // Build query
         $qb = $this->createQueryBuilder('game');
         
@@ -204,56 +176,25 @@ class GameRepository extends EntityRepository
         
         $qb->leftJoin('game.teams','gameTeam');
         
-        if ($projectIds)
+        if ($projectKeys)
         {
-            $qb->andWhere('game.projectId IN (:projectIds)');
-            $qb->setParameter('projectIds',$projectIds);
+            $qb->andWhere('game.projectKey IN (:projectKeys)');
+            $qb->setParameter('projectKeys',$projectKeys);
         }
-        if ($levelIds)
+        if ($levelKeys)
         {
-            $qb->andWhere('gameTeam.levelId IN (:levelIds)');
-            $qb->setParameter('levelIds',$levelIds);
+            $qb->andWhere('gameTeam.levelKey IN (:levelKeys)');
+            $qb->setParameter('levelKeys',$levelKeys);
         }
         $qb->addOrderBy('gameTeam.name');
        
-        $items = $qb->getQuery()->getArrayResult();
+        $rows = $qb->getQuery()->getScalarResult();
         
         $choices = array();
-        foreach($items as $item)
-        {
-            $choices[$item['name']] = $item['name'];
-        }
+        
+        array_walk($rows, function($row) use (&$choices) { $choices[$row['name']] = $row['name']; });
+        
         return $choices;
-    }
-    /* ========================================================
-     * For pulling stuff out of criteria
-     */
-    protected function getScalerValue($criteria,$name)
-    {
-        if (!isset($criteria[$name])) return null;
-
-        return $criteria[$name];
-    }
-    protected function getArrayValue($criteria,$name)
-    {
-        if (!isset($criteria[$name])) return null;
-        
-        $value = $criteria[$name];
-        
-        if (!is_array($value)) return array($value);
-        
-        if (count($value) < 1) return null;
-        
-        // This nonsense filters out 0 or null values
-        $values  = $value;
-        $valuesx = array();
-        foreach($values as $value)
-        {
-            if ($value) $valuesx[] = $value;
-        }
-        if (count($valuesx) < 1) return null;
-        
-        return $valuesx;
     }
 }
 ?>

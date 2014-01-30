@@ -16,10 +16,12 @@ CREATE TABLE projects (
  * PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
  * 
  */
-class Project extends AbstractEntity
+class Project
 {
     protected $key;
     protected $name;
+    protected $slug1;  // If active
+    protected $slug2;  // If not active
     
     protected $status = 'Active';
      

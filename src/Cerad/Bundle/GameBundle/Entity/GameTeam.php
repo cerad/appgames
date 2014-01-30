@@ -6,7 +6,7 @@ namespace Cerad\Bundle\GameBundle\Entity;
  * Each game has a project and a level
  * game.num is unique within project
  */
-class GameTeam extends AbstractEntity
+class GameTeam
 {
     const RoleHome = 'Home';
     const RoleAway = 'Away';
@@ -22,7 +22,7 @@ class GameTeam extends AbstractEntity
     
     protected $game;
     
-    protected $team;
+    protected $team; // Maybe a future link to project team
     protected $name;
     
     protected $levelKey;      // Could be different than the game
@@ -44,15 +44,17 @@ class GameTeam extends AbstractEntity
     public function getStatus()   { return $this->status;   }
     public function getConduct()  { return $this->conduct;  }
     
-    public function setSlot    ($value) { $this->onPropertySet('slot',     $value); }
-    public function setRole    ($value) { $this->onPropertySet('role',     $value); }
-    public function setGame    ($value) { $this->onPropertySet('game',     $value); }
-    public function setTeam    ($value) { $this->onPropertySet('team',     $value); }
-    public function setName    ($value) { $this->onPropertySet('name',     $value); }
-    public function setLevelKey($value) { $this->onPropertySet('levelKey', $value); }
-    public function setScore   ($value) { $this->onPropertySet('score',    $value); }
-    public function setStatus  ($value) { $this->onPropertySet('status',   $value); }
-    public function setConduct ($value) { $this->onPropertySet('conduct',  $value); }
+    public function setSlot    ($value) { $this->slot     = $value; }
+    public function setRole    ($value) { $this->role     = $value; }
+    public function setGame    ($value) { $this->game     = $value; }
+    public function setTeam    ($value) { $this->team     = $value; }
+    public function setName    ($value) { $this->name     = $value; }
+    public function setLevelKey($value) { $this->levelKey = $value; }
+    public function setScore   ($value) { $this->score    = $value; }
+    public function setStatus  ($value) { $this->status   = $value; }
+    public function setConduct ($value) { $this->conduct  = $value; }
+    
+    public function getProjectKey() { return $this->game->getProjectKey(); }
     
     public function getRoleForSlot($slot)
     {

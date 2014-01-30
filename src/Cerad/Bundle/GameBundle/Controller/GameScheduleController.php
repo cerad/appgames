@@ -42,7 +42,7 @@ class GameScheduleController extends Controller
         $tplData['searchForm'] = $searchForm->createView();
         $tplData['games']   = $games;
         $tplData['isAdmin'] = false;
-        return $this->render('@CeradGame\Game\Schedule\GameScheduleIndex.html.twig',$tplData);
+        return $this->render($request->get('_template'),$tplData);
     }
     public function getModel(Request $request)
     {   
@@ -85,8 +85,8 @@ class GameScheduleController extends Controller
         $levelRepo   = $this->get('cerad_level.level_repository');
         $projectRepo = $this->get('cerad_project.project_repository');
         
-        $model['levelIds'  ] = $levelRepo->queryLevelIds    ($model);
-        $model['projectIds'] = $projectRepo->queryProjectIds($model);
+        $model['levelKeys'  ] = $levelRepo->queryLevelKeys    ($model);
+        $model['projectKeys'] = $projectRepo->queryProjectKeys($model);
     
         // Done
         return $model;

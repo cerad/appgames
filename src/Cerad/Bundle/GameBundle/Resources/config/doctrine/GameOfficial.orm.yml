@@ -32,6 +32,18 @@ Cerad\Bundle\GameBundle\Entity\GameOfficial:
             type:     string
             length:   20
             nullable: false
+                
+        assignRole:
+            column:   assignRole
+            type:     string
+            length:   40
+            nullable: true
+            
+        assignState:
+            column:   assignState
+            type:     string
+            length:   20
+            nullable: true
             
         personNameFull:
             column:   personNameFull
@@ -39,11 +51,6 @@ Cerad\Bundle\GameBundle\Entity\GameOfficial:
             length:   80
             nullable: true
                 
-        state:
-            column:   state
-            type:     string
-            length:   20
-            nullable: true
             
         status:
             column:   status

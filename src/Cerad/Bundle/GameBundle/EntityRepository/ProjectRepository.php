@@ -1,47 +1,12 @@
 <?php
-
 namespace Cerad\Bundle\GameBundle\EntityRepository;
-
-use Doctrine\ORM\EntityRepository;
 
 use Cerad\Bundle\GameBundle\Entity\Project as ProjectEntity;
 
-
-class ProjectRepository extends EntityRepository
+class ProjectRepository extends AbstractRepository
 {   
     public function createProject($params = null) { return new ProjectEntity($params); }
-
-    /* ==========================================================
-     * Find stuff
-     */
-    public function find($id)
-    {
-        return $id ? parent::find($id) : null;
-    }
-    /* ==========================================================
-     * Persistence
-     */
-    public function save($entity) { return $this->getEntityManager()->persist($entity); }
-    public function commit()      { return $this->getEntityManager()->flush();          }
     
-    /* ====================================================
-     * Hashes up array values
-     * Keep for now but it really should only be used by the sync routines
-     */
-    public function hash($value)
-    {
-        if (is_array($value))
-        {
-            $array = $value;
-            $value = null;
-            
-            // Trim and cat
-            array_walk($array, function($val) use (&$value) { $value .= trim($val); });
-        }
-        $value = strtoupper(str_replace(array(' ','~','-',"'"),'',$value));
-        
-        return $value;
-    }
     /* ================================================
      * Return a list of project ids
      */
@@ -55,7 +20,7 @@ class ProjectRepository extends EntityRepository
         // Build query
         $qb = $this->createQueryBuilder('project');
 
-        $qb->select('project.key');
+        $qb->select('distinct project.key');
         
         if ($seasons)
         {
@@ -77,13 +42,15 @@ class ProjectRepository extends EntityRepository
             $qb->andWhere('project.domainSub IN (:domainSubs)');
             $qb->setParameter('domainSubs',$domainSubs);
         }
-        $items = $qb->getQuery()->getArrayResult();
+        /* ================================================
+         * These both return the same array structure
+         * The scaler results alwys returns a flat structure, no sure if it is any faster
+         */
+      //$rows = $qb->getQuery()->getArrayResult();
+        $rows = $qb->getQuery()->getScalarResult();
         
         $keys = array();
-        foreach($items as $item)
-        {
-            $keys[] = $item['key'];
-        }
+        array_walk($rows, function($row) use (&$keys) { $keys[] = $row['key']; });
         return $keys;
     }
     /* -----------------------------------------------------
@@ -105,13 +72,12 @@ class ProjectRepository extends EntityRepository
         }
         $qb->addOrderBy('project.domain');
        
-        $items = $qb->getQuery()->getArrayResult();
+        $rows = $qb->getQuery()->getScalarResult();
         
         $choices = array();
-        foreach($items as $item)
-        {
-            $choices[$item['domain']] = $item['domain'];
-        }
+        
+        array_walk($rows, function($row) use (&$choices) { $choices[$row['domain']] = $row['domain']; });
+        
         return $choices;
     }
     public function queryDomainSubChoices($criteria = array())
@@ -135,43 +101,14 @@ class ProjectRepository extends EntityRepository
             $qb->setParameter('domains',$domains);
         }
         $qb->addOrderBy('project.domain, project.domainSub');
-       
-        $items = $qb->getQuery()->getArrayResult();
         
+        $rows = $qb->getQuery()->getScalarResult();
         $choices = array();
-        foreach($items as $item)
-        {
-            $choices[$item['domainSub']] = $item['domain'] . ' ' . $item['domainSub'];
-        }
+        array_walk($rows, function($row) use (&$choices) 
+        { 
+            $choices[$row['domainSub']] = $row['domain'] . ' ' . $row['domainSub']; 
+        });
         return $choices;
     }
-    protected function getScalerValue($criteria,$name)
-    {
-        if (!isset($criteria[$name])) return null;
-
-        return $criteria[$name];
-    }
-    protected function getArrayValue($criteria,$name)
-    {
-        if (!isset($criteria[$name])) return null;
-        
-        $value = $criteria[$name];
-        
-        if (!is_array($value)) return array($value);
-        
-        if (count($value) < 1) return null;
-        
-        // This nonsense filters out 0 or null values
-        $values  = $value;
-        $valuesx = array();
-        foreach($values as $value)
-        {
-            if ($value) $valuesx[] = $value;
-        }
-        if (count($valuesx) < 1) return null;
-        
-        return $valuesx;
-    }
-
 }
 ?>

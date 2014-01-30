@@ -16,7 +16,8 @@ class GameOfficial
     protected $slot; // 1-5 for arbiter
     protected $role; // Referee, AR1 etc
     
-    protected $assignRole; // // ROLE_USER, ROLE_ASSIGNOR
+    protected $assignRole;  // ROLE_USER, ROLE_ASSIGNOR
+    protected $assignState; // Pending,Requested etc
     
     protected $personNameFull;
     protected $personEmail;
@@ -28,11 +29,6 @@ class GameOfficial
     
     protected $report;
     protected $status = 'Active';
-   
-    protected $state;           // Workflow
-    protected $stateUpdatedOn;
-    protected $stateUpdatedBy;
-    
     
     public function getId  () { return $this->id;     }
     public function getGame() { return $this->game;   }
@@ -40,59 +36,47 @@ class GameOfficial
     public function getRole() { return $this->role;   }
     
     public function getAssignRole     () { return $this->assignRole;      }
+    public function getAssignState    () { return $this->assignState;     }
     
     public function getPersonNameFull () { return $this->personNameFull;  }
+    
     public function getPersonNameLast () { return $this->personNameLast;  }
     public function getPersonNameFirst() { return $this->personNameFirst; }
     public function getPersonEmail    () { return $this->personEmail;     }
     public function getPersonPhone    () { return $this->personPhone;     }
     public function getPersonBadge    () { return $this->personBadge;     }
     public function getPersonGuid     () { return $this->personGuid;      }
-    public function getPersonFedId    () { return $this->personFedId;     }
-    public function getPersonOrgId    () { return $this->personOrgId;     }
-    public function getPersonFedKey   () { return $this->personFedId;     }
-    public function getPersonOrgKey   () { return $this->personOrgId;     }
     
     public function getReport()          { return $this->report;          }
     public function getStatus()          { return $this->status;          }
-    
-    public function getState()          { return $this->state;          }
-    public function getStateUpdatedOn() { return $this->stateUpdatedOn; }
-    public function getStateUpdatedBy() { return $this->stateUpdatedBy; }
 
-    public function setGame($value) { $this->onPropertySet('game',  $value); }
-    public function setSlot($value) { $this->onPropertySet('slot',  $value); } 
-    public function setRole($value) { $this->onPropertySet('role',  $value); }
+    public function setGame($value) { $this->game = $value; }
+    public function setSlot($value) { $this->slot = $value; } 
+    public function setRole($value) { $this->role = $value; }
     
-    public function setAssignRole     ($value) { $this->onPropertySet('assignRole',$value); }
+    public function setAssignRole     ($value) { $this->assignRole  = $value; }
+    public function setAssignState    ($value) { $this->assignState = $value; }
      
-    public function setPersonNameFull ($value) { $this->onPropertySet('personNameFull', $value); }
-    public function setPersonNameLast ($value) { $this->onPropertySet('personNameLast', $value); }
-    public function setPersonNameFirst($value) { $this->onPropertySet('personNameFirst',$value); }
-    public function setPersonEmail    ($value) { $this->onPropertySet('personEmail',    $value); }
-    public function setPersonPhone    ($value) { $this->onPropertySet('personPhone',    $value); }
-    public function setPersonBadge    ($value) { $this->onPropertySet('personBadge',    $value); }
-    public function setPersonGuid     ($value) { $this->onPropertySet('personGuid',     $value); }
-    public function setPersonFedId    ($value) { $this->onPropertySet('personFedId',    $value); }
-    public function setPersonOrgId    ($value) { $this->onPropertySet('personOrgId',    $value); }
-    public function setPersonFedKey   ($value) { $this->onPropertySet('personFedId',    $value); }
-    public function setPersonOrgKey   ($value) { $this->onPropertySet('personOrgId',    $value); }
+    public function setPersonNameFull ($value) { $this->personNameFull  = $value; }
+    public function setPersonNameLast ($value) { $this->personNameLast  = $value; }
+    public function setPersonNameFirst($value) { $this->personNameFirst = $value; }
+    public function setPersonEmail    ($value) { $this->personEmail     = $value; }
+    public function setPersonPhone    ($value) { $this->personPhone     = $value; }
+    public function setPersonBadge    ($value) { $this->personBadge     = $value; }
+    public function setPersonGuid     ($value) { $this->personGuid      = $value; }
+    public function setPersonFedKey   ($value) { $this->personFedKey    = $value; }
+    public function setPersonOrgKey   ($value) { $this->personOrgKey    = $value; }
     
-    public function setReport         ($value) { $this->onPropertySet('report',         $value); }
-    public function setStatus         ($value) { $this->onPropertySet('status',         $value); }
-    
-    public function setState          ($value) { $this->onPropertySet('state',          $value); }
-    public function setStateUpdatedOn ($value) { $this->onPropertySet('stateUpdatedOn', $value); }
-    public function setStateUpdatedBy ($value) { $this->onPropertySet('stateUpdatedBy', $value); }
+    public function setReport         ($value) { $this->report = $value; }
+    public function setStatus         ($value) { $this->status = $value; }
     
     /* ===================================================
      * Are users allowed to self assign?
      */
     public function isUserAssignable()
     {
-        return $this->assignRole == 'ROLE_USER' ? true : false;
+        return strpos($this->assignRole,'ROLE_USER') !== false ? true : false;
     }
-    
     /* =========================================
      * Used to highlite objects
      */

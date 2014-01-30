@@ -235,10 +235,10 @@ EOT;
                 
         $sql = <<<EOT
 SELECT
-    official.id    AS id,
-    official.slot  AS slot,
-    official.role  AS role,
-    official.state AS state,
+    official.id             AS id,
+    official.slot           AS slot,
+    official.role           AS role,
+    official.assignState    AS assignState,
     official.personNameFull AS name
 FROM  
     game_officials AS official
@@ -256,9 +256,9 @@ EOT;
                 
         $sql = <<<EOT
 UPDATE game_officials SET
-    slot  = :slot,
-    role  = :role,
-    state = :state,
+    slot           = :slot,
+    role           = :role,
+    assignState    = :state,
     personNameFull = :name
 WHERE id = :id
 ;
@@ -273,8 +273,8 @@ EOT;
                 
         $sql = <<<EOT
 INSERT INTO game_officials
-      ( gameId, slot, role, state, personNameFull)
-VALUES(:gameId,:slot,:role,:state,:name)
+      ( gameId, slot, role, assignState, personNameFull)
+VALUES(:gameId,:slot,:role,:assignState,:name)
 ;
 EOT;
         return $this->prepared[$key] = $this->conn->prepare($sql);
@@ -285,10 +285,8 @@ EOT;
         
         if (isset($this->prepared[$key])) return $this->prepared[$key];
                         
-        $sql = <<<EOT
-DELETE FROM game_officials WHERE id = :id
-;
-EOT;
+        $sql = 'DELETE FROM game_officials WHERE id = :id;';
+
         return $this->prepared[$key] = $this->conn->prepare($sql);
     }
 }

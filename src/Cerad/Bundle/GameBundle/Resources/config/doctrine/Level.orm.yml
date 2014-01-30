@@ -1,8 +1,7 @@
 Cerad\Bundle\GameBundle\Entity\Level:
     type:  entity
     table: levels
-    repositoryClass: Cerad\Bundle\GameBundle\Entity\LevelRepository
-    changeTrackingPolicy: NOTIFY
+    repositoryClass: Cerad\Bundle\GameBundle\EntityRepository\LevelRepository
     
     indexes:
        level_sport_index:
@@ -26,12 +25,6 @@ Cerad\Bundle\GameBundle\Entity\Level:
             length:   40
             nullable: false
             
-        program:
-            column:   program   # Reserves word
-            type:     string
-            length:   20
-            nullable: true
-            
         age:
             column:   age
             type:     string
@@ -40,6 +33,12 @@ Cerad\Bundle\GameBundle\Entity\Level:
             
         gender:
             column:   gender
+            type:     string
+            length:   20
+            nullable: true
+            
+        program:
+            column:   program
             type:     string
             length:   20
             nullable: true

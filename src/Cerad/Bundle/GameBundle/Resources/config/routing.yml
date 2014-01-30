@@ -1,6 +1,8 @@
 cerad_game_schedule:
     pattern:  /
-    defaults: { _controller: CeradGameBundle:GameSchedule:index }
+    defaults: 
+        _controller: CeradGameBundle:GameSchedule:index
+        _template: '@CeradGame\Game\Schedule\GameScheduleIndex.html.twig'
     
 cerad_game_schedule_import:
     pattern:  /import

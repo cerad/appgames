@@ -288,7 +288,7 @@ class ArbiterGamesWithSlotsImportPDO
         if ($gameOfficial['name'] != $name)     
         { 
             $gameOfficial['name']  = $name;
-            $gameOfficial['state'] = null;
+            $gameOfficial['assignState'] = null;
             $needUpdate = true; 
         }
         if ($needUpdate)
@@ -455,7 +455,7 @@ class ArbiterGamesWithSlotsImportPDO
                     'slot'  => $slot,
                     'role'  => $row[$roleIndex],
                     'name'  => $name,
-                    'state' => null,
+                    'assignState' => null,
                 );
            }
         }

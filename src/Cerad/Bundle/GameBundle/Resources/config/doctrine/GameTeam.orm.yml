@@ -1,7 +1,6 @@
 Cerad\Bundle\GameBundle\Entity\GameTeam:
     type:  entity
     table: game_teams
-    changeTrackingPolicy: NOTIFY
     uniqueConstraints:
        game_team_game_slot_index:
            columns: gameId, slot

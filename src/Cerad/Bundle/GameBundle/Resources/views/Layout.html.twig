@@ -1,11 +1,18 @@
 {# @CeradGame/Layout.html.twig #}
 {% extends '@CeradGame/Base.html.twig' %}
 
-{# block stylesheets %}
-<link rel="stylesheet" href="{{ asset('bundles/ceradtourns/css/reset.css') }}" media="all" />
-<link rel="stylesheet" href="{{ asset('bundles/ceradtourns/css/basic.css') }}" media="all" />
-<link rel="stylesheet" href="{{ asset('bundles/ceradtourns/css/forms.css') }}" media="all" />
-{% endblock #}
+{% block stylesheets %}
+{{ parent() }}
+{% stylesheets 
+     output='/css/cerad.css'
+    '@CeradGameBundle/Resources/public/css/reset.css'
+    '@CeradGameBundle/Resources/public/css/basic.css'
+    '@CeradGameBundle/Resources/public/css/games.css'
+%}
+    <link rel="stylesheet" href="{{ asset_url }}" />
+{% endstylesheets %}
+{%endblock %} 
+
 
 {% block layout_body %}
 <div id="layout-body">

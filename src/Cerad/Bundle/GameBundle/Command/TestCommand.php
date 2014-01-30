@@ -19,7 +19,35 @@ class TestCommand extends ContainerAwareCommand
     
     protected function execute(InputInterface $input, OutputInterface $output)
     {   
-        $this->testProjectRepo();
+        $this->testGameRepo   ();
+      //$this->testLevelRepo  ();
+      //$this->testProjectRepo();
+    }
+    protected function testGameRepo()
+    {   
+        $gameRepo = $this->getService('cerad_game.game_repository');
+        
+        $criteria = array();
+        $criteria['projectKeys'] = 'ALYS_SOCCER_NASL_FALL2013';
+        
+        $fields = $gameRepo->queryFieldChoices($criteria);
+        print_r($fields);
+        
+        $criteria['levelKeys'] =  'ALYS_SOCCER_NASL_U10GIRLS, ALYS_SOCCER_NASL_U14BOYS';
+       
+        $teams = $gameRepo->queryTeamChoices($criteria);
+        print_r($teams);
+        
+    }
+    protected function testLevelRepo()
+    {   
+        $levelRepo = $this->getService('cerad_level.level_repository');
+        
+        $levels = $levelRepo->queryLevelChoices();
+        print_r($levels);
+        
+        $levelKeys = $levelRepo->queryLevelKeys(array('domainSubs' => 'NASL,AHSAA'));
+        print_r($levelKeys);
         
     }
     protected function testProjectRepo()

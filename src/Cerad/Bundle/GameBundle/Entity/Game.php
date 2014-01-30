@@ -7,9 +7,13 @@ use Doctrine\Common\Collections\ArrayCollection;
  * Each game has a project and a level
  * game.num is unique within project
  */
-class Game extends AbstractEntity
+class Game
 {
-    const RoleGame = 'Game';
+    const RoleGame      = 'Game';
+    const RolePractice  = 'Practice';
+    const RoleScrimmage = 'Scrimmage';
+    const RoleJamboree  = 'Jamboree';
+    const RoleReserve   = 'Reserve';
 
     protected $id;
     
@@ -17,7 +21,7 @@ class Game extends AbstractEntity
     protected $role = self::RoleGame;
     
     protected $groupKey;
-    protected $groupType;
+    protected $groupType; // PP QF SF FM CM SM
     
     protected $link;   // Maybe to link crews?
     
@@ -27,7 +31,7 @@ class Game extends AbstractEntity
     protected $levelKey;
     protected $projectKey;
     
-    protected $field;
+    protected $field;  // Name for now, needs to be a link to project fields or game fields
     
     protected $status;
     
@@ -37,8 +41,6 @@ class Game extends AbstractEntity
     public function getId()      { return $this->id;      }
     public function getNum()     { return $this->num;     }
     public function getRole()    { return $this->role;    }
-    public function getPool()    { return $this->pool;    }
-    public function getLink()    { return $this->link;    }
     public function getField()   { return $this->field;   }
     public function getDtBeg()   { return $this->dtBeg;   }
     public function getDtEnd()   { return $this->dtEnd;   }
@@ -46,27 +48,25 @@ class Game extends AbstractEntity
     
     public function getLevelKey()   { return $this->levelKey;   }
     public function getProjectKey() { return $this->projectKey; }
+    public function getGroupKey()   { return $this->groupKey;   }
+    public function getGroupType()  { return $this->groupType;  }
     
-    public function setNum      ($value) { $this->onPropertySet('num',      $value); }
-    public function setLink     ($value) { $this->onPropertySet('link',     $value); }
-    public function setRole     ($value) { $this->onPropertySet('role',     $value); }
-    public function setPool     ($value) { $this->onPropertySet('pool',     $value); }
-    public function setField    ($value) { $this->onPropertySet('field',    $value); }
-    public function setDtBeg    ($value) { $this->onPropertySet('dtBeg',    $value); }
-    public function setDtEnd    ($value) { $this->onPropertySet('dtEnd',    $value); }
-    public function setStatus   ($value) { $this->onPropertySet('status',   $value); }
+    public function setNum      ($value) { $this->num    = $value; }
+    public function setRole     ($value) { $this->role   = $value; }
+    public function setField    ($value) { $this->field  = $value; }
+    public function setDtBeg    ($value) { $this->dtBeg  = $value; }
+    public function setDtEnd    ($value) { $this->dtEnd  = $value; }
+    public function setStatus   ($value) { $this->status = $value; }
     
-    public function setLevelKey  ($value) { $this->onPropertySet('levelKey',  $value); }
-    public function setProjectKey($value) { $this->onPropertySet('projectKey',$value); }
+    public function setLevelKey  ($value) { $this->levelKey   = $value; }
+    public function setProjectKey($value) { $this->projectKey = $value; }
+    public function setGroupKey  ($value) { $this->groupKey   = $value; }
+    public function setGroupType ($value) { $this->groupType  = $value; }
     
-    /* =======================================
-     * Create factory
-     * Too many parameters
-     */
     public function __construct()
     {
         $this->teams   = new ArrayCollection();
-        $this->persons = new ArrayCollection();
+        $this->persons = new ArrayCollection();  // Rename to officials some time
     }
     /* =======================================
      * Team stuff
@@ -88,7 +88,7 @@ class Game extends AbstractEntity
         
         $team->setGame($this);
         
-        $this->onPropertyChanged('teams');
+      //$this->onPropertyChanged('teams');
     }
     public function getTeamForSlot($slot,$autoCreate = true)
     {
@@ -110,24 +110,24 @@ class Game extends AbstractEntity
     /* =======================================
      * Person stuff
      */
-    public function getPersons($sort = true) 
+    public function getOfficials($sort = true) 
     { 
-        if (!$sort) return $this->persons;
+        if (!$sort) return $this->officials;
         
-        $items = $this->persons->toArray();
+        $items = $this->officials->toArray();
         
         ksort ($items);
         return $items; 
     }
-    public function addPerson($person)
+    public function addOfficial($official)
     {
-        $this->persons[$person->getSlot()] = $person;
+        $this->officials[$official->getSlot()] = $official;
         
-        $person->setGame($this);
+        $official->setGame($this);
     }
-    public function getPersonForSlot($slot)
+    public function getOfficialForSlot($slot)
     {
-        if (isset($this->persons[$slot])) return $this->persons[$slot];
+        if (isset($this->officials[$slot])) return $this->officials[$slot];
         
         return null;
     }
@@ -137,6 +137,8 @@ class Game extends AbstractEntity
      */
     public function __toString()
     {
+        die('game.__toString()');
+        
         ob_start();
 
         echo sprintf("Game %-6s %-4s %6s %-8s %s   %-8s %-10s %s\n",
