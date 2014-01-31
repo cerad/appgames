@@ -32,7 +32,7 @@
             <td class="schedule-dow" >{{ game.dtBeg.format('D'    ) }}</td>
             <td class="schedule-time">{{ game.dtBeg.format('g:i A') }}</td>    
             <td>{{ game.field      }}</td>
-            <td>{{ level.domain }} {{ level.domainSub }}</td>
+            <td>{{ level.domain }}<br />{{ level.domainSub }}</td>
             <td>{{ level.name   }}
                 {# if game_is_section_match(game) %}<br /><span class="game-no-tie">SM - No Tie</span>{% endif #}
             </td>

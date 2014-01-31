@@ -6,7 +6,7 @@ span.official-summary-A-A,
 span.official-summary-A-A-A,
 span.official-summary-A-A-A-A
 { 
-    color: green; font-weight:bold; 
+    color: #00CC00; font-weight: bold; 
 }
 
 table.schedule-games-list
@@ -25,7 +25,7 @@ table.schedule-games-list td
 table.schedule-games-list table td { border: none }
 
 /* Schedule table widths */
-th.schedule-game              { width:  50px; text-align: center; }
+th.schedule-game              { width:  60px; text-align: center; }
 th.schedule-status            { width:  65px; text-align: center; }
 th.schedule-date              { width:  80px; }
 th.schedule-dow               { width:  40px; text-align: center; }
