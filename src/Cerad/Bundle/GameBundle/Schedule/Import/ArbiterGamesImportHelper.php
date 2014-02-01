@@ -260,7 +260,7 @@ EOT;
 UPDATE game_officials SET
     slot           = :slot,
     role           = :role,
-    assignState    = :state,
+    assignState    = :assignState,
     personNameFull = :name
 WHERE id = :id
 ;
