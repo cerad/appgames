@@ -207,7 +207,8 @@ class ArbiterGamesWithSlotsImportPDO
             'projectKey' => $projectKey,
             'num'        => $num,
             'levelKey'   => $levelKey,
-            'field'      => $row['field' ],
+            'fieldName'  => $row['fieldName'],
+            'venueName'  => $row['venueName'],
             'dtBeg'      => $row['dtBeg' ],
             'dtEnd'      => $row['dtEnd' ],
             'status'     => $row['status'],
@@ -238,11 +239,12 @@ class ArbiterGamesWithSlotsImportPDO
     {
         // See if game needs updating
         $needUpdate = false;
-        if ($game['levelKey'] != $levelKey)      { $game['levelKey'] = $levelKey;      $needUpdate = true; }
-        if ($game['field']    != $row['field' ]) { $game['field']    = $row['site'];   $needUpdate = true; }
-        if ($game['dtBeg']    != $row['dtBeg' ]) { $game['dtBeg']    = $row['dtBeg'];  $needUpdate = true; }
-        if ($game['dtEnd']    != $row['dtEnd' ]) { $game['dtEnd']    = $row['dtEnd'];  $needUpdate = true; }
-        if ($game['status']   != $row['status']) { $game['status']   = $row['status']; $needUpdate = true; }
+        if ($game['levelKey']  != $levelKey)         { $game['levelKey']  = $levelKey;         $needUpdate = true; }
+        if ($game['fieldName'] != $row['fieldName']) { $game['fieldName'] = $row['fieldName']; $needUpdate = true; }
+        if ($game['venueName'] != $row['venueName']) { $game['venueName'] = $row['venueName']; $needUpdate = true; }
+        if ($game['dtBeg']     != $row['dtBeg'])     { $game['dtBeg']     = $row['dtBeg'];     $needUpdate = true; }
+        if ($game['dtEnd']     != $row['dtEnd'])     { $game['dtEnd']     = $row['dtEnd'];     $needUpdate = true; }
+        if ($game['status']    != $row['status'])    { $game['status']    = $row['status'];    $needUpdate = true; }
         
         if ($needUpdate)
         {
@@ -403,7 +405,9 @@ class ArbiterGamesWithSlotsImportPDO
             
             'num'   => (int)$row['num'],
             
-            'field'  => $row['site'],
+            'fieldName' => $row['site'],
+            'venueName' => null,
+            
             'status' => $row['status'],
             
             'dtBeg' => str_replace('T',' ',$row['dtBeg']),
@@ -411,6 +415,12 @@ class ArbiterGamesWithSlotsImportPDO
             
             'gameReportStatus' => $gameReportStatus,
         );
+        if ($row['siteSub'])
+        {
+            // Merrimack, MM05
+            $rowx['fieldName'] = sprintf('%s, %s',$row['site'],$row['siteSub']);
+            $rowx['venueName'] = $row['site'];
+        }
         /* ======================================================
          * Pull out teams
          */

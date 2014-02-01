@@ -69,7 +69,7 @@ class GameRepository extends AbstractRepository
         }
         if ($fieldNames)
         {
-            $qb->andWhere('game.field IN (:fieldNames)');
+            $qb->andWhere('game.fieldName IN (:fieldNames)');
             $qb->setParameter('fieldNames',$fieldNames);
         }
         if ($levelKeys)
@@ -144,21 +144,23 @@ class GameRepository extends AbstractRepository
         // Build query
         $qb = $this->createQueryBuilder('game');
         
-        $qb->select('distinct game.field');
+        $qb->select('distinct game.fieldName');
         
         if ($projectKeys)
         {
             $qb->andWhere('game.projectKey IN (:projectKeys)');
             $qb->setParameter('projectKeys',$projectKeys);
         }
-        $qb->addOrderBy('game.field');
+        $qb->addOrderBy('game.fieldName');
        
         $rows = $qb->getQuery()->getScalarResult();
         
         $choices = array();
         
-        array_walk($rows, function($row) use (&$choices) { $choices[$row['field']] = $row['field']; });
-        
+        array_walk($rows, function($row) use (&$choices) 
+        { 
+            $choices[$row['fieldName']] = $row['fieldName']; 
+        });
         return $choices;
     }
     /* ========================================================

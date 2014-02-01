@@ -55,8 +55,14 @@ Cerad\Bundle\GameBundle\Entity\Game:
             length:   20
             nullable: false
             
-        field:
-            column:   field
+        venueName:
+            column:   venueName
+            type:     string
+            length:   40
+            nullable: true
+            
+        fieldName:
+            column:   fieldName
             type:     string
             length:   40
             nullable: true

@@ -20,6 +20,7 @@ class Project
 {
     protected $key;
     protected $name;
+    protected $role;   // Tournament, Season
     protected $slug1;  // If active
     protected $slug2;  // If not active
     
@@ -33,6 +34,7 @@ class Project
    
     public function getKey()  { return $this->key;  }
     public function getName() { return $this->name; }
+    public function getRole() { return $this->role; }
     
     public function getSeason()    { return $this->season;  }
     public function getStatus()    { return $this->status;  }
@@ -43,6 +45,7 @@ class Project
     
     public function setKey      ($value) { $this->key    = $value; }
     public function setName     ($value) { $this->name   = $value; }
+    public function setRole     ($value) { $this->role   = $value; }
     public function setSeason   ($value) { $this->season = $value; }
     public function setStatus   ($value) { $this->status = $value; }
     

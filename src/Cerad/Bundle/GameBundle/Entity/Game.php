@@ -31,7 +31,9 @@ class Game
     protected $levelKey;
     protected $projectKey;
     
-    protected $field;  // Name for now, needs to be a link to project fields or game fields
+  //protected $field;     // Name for now, needs to be a link to project fields or game fields
+    protected $fieldName; // This is unique 
+    protected $venueName; // Very handy to have
     
     protected $status;
     
@@ -41,10 +43,13 @@ class Game
     public function getId()      { return $this->id;      }
     public function getNum()     { return $this->num;     }
     public function getRole()    { return $this->role;    }
-    public function getField()   { return $this->field;   }
     public function getDtBeg()   { return $this->dtBeg;   }
     public function getDtEnd()   { return $this->dtEnd;   }
     public function getStatus()  { return $this->status;  }
+    
+  //public function getField()      { return $this->field;      }
+    public function getFieldName()  { return $this->fieldName;  }
+    public function getVenueName()  { return $this->venueName;  }
     
     public function getLevelKey()   { return $this->levelKey;   }
     public function getProjectKey() { return $this->projectKey; }
@@ -53,10 +58,13 @@ class Game
     
     public function setNum      ($value) { $this->num    = $value; }
     public function setRole     ($value) { $this->role   = $value; }
-    public function setField    ($value) { $this->field  = $value; }
     public function setDtBeg    ($value) { $this->dtBeg  = $value; }
     public function setDtEnd    ($value) { $this->dtEnd  = $value; }
     public function setStatus   ($value) { $this->status = $value; }
+    
+  //public function setField    ($value) { $this->field     = $value; }
+    public function setFieldName($value) { $this->fieldName = $value; }
+    public function setVenueName($value) { $this->venueName = $value; }
     
     public function setLevelKey  ($value) { $this->levelKey   = $value; }
     public function setProjectKey($value) { $this->projectKey = $value; }

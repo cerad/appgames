@@ -26,15 +26,12 @@ class GameScheduleImportController extends Controller
             $model = $form->getData();
             
             $this->processModel($model);
-            
-          //$request->getSession()->set(self::SESSION_GAME_SCHEDULE_SEARCH,$modelPosted);
-            
-          //return $this->redirect($this->generateUrl('cerad_game_schedule'));
         }
         
         // Render
         $tplData = array();
         $tplData['form'] = $form->createView();
+        $tplData['results'] = $model['results'];
         return $this->render('@CeradGame\GameSchedule\Import\GameScheduleImportIndex.html.twig',$tplData);
     }
     /* ========================================================
@@ -43,15 +40,21 @@ class GameScheduleImportController extends Controller
      * 
      * But for now, just process the silly thing
      */
-    public function processModel($model)
+    public function processModel(&$model)
     {
       //$file->move($dir, $file->getClientOriginalName());
         
         $file = $model['attachment'];
         
-        echo sprintf("Max file size %d %d Valid: %d, Error: %d<br />\n",
-            $file->getMaxFilesize(),$file->getClientSize(),$file->isValid(), $file->getError());
-        
+        if (!$file->isValid())
+        {
+            $model['results'] = sprintf("Max file size %d %d Valid: %d, Error: %d<br />\n",
+                $file->getMaxFilesize(), // Returns null?
+                $file->getClientSize(),
+                $file->isValid(), 
+                $file->getError());
+            return $model;
+        }
         $importFilePath = $file->getPathname();
         $clientFileName = $file->getClientOriginalName();
         
@@ -71,15 +74,11 @@ class GameScheduleImportController extends Controller
         $params['format'] = $parts[2];
         $params['suffix'] = $parts[3];
         
-        $importServiceId = sprintf('cerad_game.schedule_Arbiter%s.import',$params['format']);
+        $importServiceId = sprintf('cerad_game.schedule_Arbiter%s.import_pdo',$params['format']);
         $importService = $this->get($importServiceId);
         
-        print_r($params); echo "<br />\n"; // die();
-        $results = $importService->import($params);
-
-        print_r($results);echo "<br />\n";
-      //php398B.tmp NASOA_Fall2013_GamesWithSlots_20130927.xml
-      //die($importFileName . ' ' . $clientFileName);
+        $results = $importService->process($params);
+        $model['results'] = $results;
         
         return $model;
     }
@@ -88,6 +87,7 @@ class GameScheduleImportController extends Controller
         // Build the search parameter information
         $model = array();
         $model['attachment'] = null;
+        $model['results'] = null;
         
         return $model;
     }

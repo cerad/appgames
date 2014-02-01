@@ -92,7 +92,8 @@ EOT;
 SELECT
     game.id        AS id,
     game.levelKey  AS levelKey,
-    game.field     AS field,
+    game.fieldName AS fieldName,
+    game.venueName AS venueName,
     game.dtBeg     AS dtBeg,
     game.dtEnd     AS dtEnd,
     game.status    AS status
@@ -109,11 +110,12 @@ EOT;
         
         $sql = <<<EOT
 UPDATE games SET
-    field    = :field,
-    levelKey = :levelKey,
-    dtBeg    = :dtBeg,
-    dtEnd    = :dtEnd,
-    status   = :status
+    fieldName = :fieldName,
+    venueName = :venueName,
+    levelKey  = :levelKey,
+    dtBeg     = :dtBeg,
+    dtEnd     = :dtEnd,
+    status    = :status
 WHERE id = :id
 ;
 EOT;
@@ -127,8 +129,8 @@ EOT;
         
         $sql = <<<EOT
 INSERT INTO games
-       ( projectKey, num, role,  levelKey, field, dtBeg, dtEnd, status)
-VALUES (:projectKey,:num,'Game',:levelKey,:field,:dtBeg,:dtEnd,:status)
+       ( projectKey, num, role,  levelKey, fieldName, venueName, dtBeg, dtEnd, status)
+VALUES (:projectKey,:num,'Game',:levelKey,:fieldName,:venueName,:dtBeg,:dtEnd,:status)
 ;
 EOT;
         return $this->prepared[$key] = $this->conn->prepare($sql);
