@@ -1,22 +1,18 @@
 <?php
-namespace Cerad\Bundle\GameBundle\Controller;
+namespace Cerad\Bundle\GameBundle\Controller\Project\GameSchedule;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class GameScheduleController extends Controller
+class GameScheduleListController extends Controller
 {
-    const SESSION_GAME_SCHEDULE_SEARCH = 'gameScheduleSearch';
+    const SessionSearch = 'ProjectGameScheduleSearch';
     
-    /* =====================================================
-     * Wanted to just use GET but the dates mess up
-     * Use the session trick for now
-     */
-    public function indexAction(Request $request)
+    public function listAction(Request $request)
     {
         // The search model
-        $model = $this->getModel($request);
+        $model = $this->createModel($request);
         
         // The form stuff
         $searchFormType = $this->get('cerad_game.game_schedule_search.form_type');
@@ -44,10 +40,13 @@ class GameScheduleController extends Controller
         $tplData['isAdmin'] = false;
         return $this->render($request->get('_template'),$tplData);
     }
-    public function getModel(Request $request)
+    public function createModel(Request $request)
     {   
         // Build the search parameter information
         $model = array();
+        
+        $projectSlug = $request->attributes->get('projectSlug');
+        die($projectSlug);
         
         $model['domains']    = array('NASOA','ALYS');
         $model['domainSubs'] = array();
@@ -83,7 +82,7 @@ class GameScheduleController extends Controller
         
         // Add in project and level ids
         $levelRepo   = $this->get('cerad_level.level_repository');
-        $projectRepo = $this->get('cerad_project__project_repository');
+        $projectRepo = $this->get('cerad_project.project_repository');
         
         $model['levelKeys'  ] = $levelRepo->queryLevelKeys    ($model);
         $model['projectKeys'] = $projectRepo->queryProjectKeys($model);

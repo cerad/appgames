@@ -22,19 +22,17 @@ class TestCommand extends ContainerAwareCommand
     {
         $projectMetaRepo = $this->getService('cerad_project__project_meta_repository');
         
-        $projectMetas = $projectMetaRepo->findAll();
-        foreach($projectMetas as $key => $meta)
+        $projects = $projectMetaRepo->findAll();
+        foreach($projects as $key => $project)
         {
-            $info = $meta['info'];
-            
             $output->writeln($key);
-            $output->writeln($info['key']);
+            $output->writeln($project->getKey());
         }
         $slug = $input->getArgument('slug');
         if (!$slug) return;
         
-        $projectMeta = $projectMetaRepo->findBySlug($slug);
-        $output->writeln($projectMeta['info']['key']);
+        $project = $projectMetaRepo->findBySlug($slug);
+        $output->writeln($project->getKey());
          
         $output->writeln('Project Test ' . $slug);
         

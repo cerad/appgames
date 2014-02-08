@@ -1,11 +1,13 @@
 <?php
 namespace Cerad\Bundle\GameBundle\EntityRepository;
 
-use Cerad\Bundle\GameBundle\Entity\Game as GameEntity;
+use Cerad\Library\Doctrine\AbstractRepository;
+
+//  Cerad\Bundle\GameBundle\Entity\Game as GameEntity;
 
 class GameRepository extends AbstractRepository
 {   
-    public function createGame($params = null) { return new GameEntity($params); }
+    public function createGame($params = null) { return $this->createEntity($params); }
 
     /* ==========================================================
      * Find stuff

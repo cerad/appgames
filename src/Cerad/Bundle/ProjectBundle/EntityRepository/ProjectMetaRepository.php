@@ -1,15 +1,13 @@
 <?php
 namespace Cerad\Bundle\ProjectBundle\EntityRepository;
 
+use Cerad\Bundle\ProjectBundle\Model\Project as ProjectModel;
+
 use Symfony\Component\Yaml\Yaml;
 
-/* =======================================================
- * Project meta data is all array for now
- * Needs to be wrapped in a real project entity
- */
 class ProjectMetaRepository
 {
-    protected $metas = array();
+    protected $projects = array();
     
     /* ============================================
      * All this does is load stash the meta data
@@ -19,43 +17,41 @@ class ProjectMetaRepository
         foreach($files as $file)
         {
             $meta = Yaml::parse(file_get_contents($file));
-            $this->metas[$meta['meta']['info']['key']] = $meta['meta'];
+            $key = $meta['meta']['info']['key'];
+            $project = new ProjectModel($meta['meta']);
+            $this->projects[$key] = $project;
         }
     }
     public function find($key)
     {
-        return isset($this->metas[$key]) ? $this->metas[$key] : null;
+        return isset($this->projects[$key]) ? $this->projects[$key] : null;
     }
     public function findAll()
     {
-        return $this->metas;    
+        return $this->projects;    
     }
     public function findAllByStatus($status)
     {
-        $metas = array();
-        foreach($this->metas as $meta)
+        $projects = array();
+        foreach($this->projects as $project)
         {
-            $info = $meta['info'];
-            if ($status == $info['status']) $metas[$info['key']] = $meta;
+            if ($status == $project->getStatus()) $projects[$project->getKey()] = $project;
         }
-        return $metas;
+        return $projects;
     }
     public function findBySlug($slug)
     {
         $slug = strtolower($slug);
         
-        foreach($this->metas as $meta)
+        foreach($this->projects as $project)
         {
-            $info = $meta['info'];
+            if ($slug == strtolower($project->getSlug2())) return $project;
             
-            if ($slug == strtolower($info['slug2'])) return $meta;
+            if ($project->getStatus() != 'Active') break;
             
-            if ($info['status'] != 'Active') break;
-            
-            if ($slug == strtolower($info['slug'])) return $meta;
+            if ($slug == strtolower($project->getSlug1())) return $project;
         }
         return null;
     }
 }
-
 ?>

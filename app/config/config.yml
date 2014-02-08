@@ -59,7 +59,6 @@ doctrine:
 
     orm:
         auto_generate_proxy_classes: %kernel.debug%
-       #auto_mapping: true
         entity_managers:
             default:
                 connection: default
@@ -68,9 +67,9 @@ doctrine:
                     CeradGameBundle: ~
                 dql:
                     datetime_functions:
-                        date:  Cerad\Bundle\GameBundle\Doctrine\DQL\Date
-                        time:  Cerad\Bundle\GameBundle\Doctrine\DQL\Time
-                        month: Cerad\Bundle\GameBundle\Doctrine\DQL\Month
+                        date:  Cerad\Library\Doctrine\DQL\Date
+                        time:  Cerad\Library\Doctrine\DQL\Time
+                        month: Cerad\Library\Doctrine\DQL\Month
                         
 # Swiftmailer Configuration
 swiftmailer:

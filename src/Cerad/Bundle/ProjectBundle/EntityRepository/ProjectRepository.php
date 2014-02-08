@@ -1,11 +1,13 @@
 <?php
 namespace Cerad\Bundle\ProjectBundle\EntityRepository;
 
-use Cerad\Bundle\GameBundle\Entity\Project as ProjectEntity;
+use Cerad\Library\Doctrine\AbstractRepository;
 
-class ProjectRepository 
+//  Cerad\Bundle\GameBundle\Entity\Project as ProjectEntity;
+
+class ProjectRepository extends AbstractRepository
 {   
-    public function createProject($params = null) { return new ProjectEntity($params); }
+    public function createProject($params = null) { return $this->createEntity($params); }
     
     /* ================================================
      * Return a list of project ids

@@ -1,7 +1,21 @@
 parameters:
 
 services:
-      cerad_project__project_meta_repository:
+  
+    cerad_project__entity_manager__doctrine:
+        alias: doctrine.orm.default_entity_manager
+        
+    cerad_project__project_repository__doctrine:
+        class:  Cerad\Bundle\ProjectBundle\Entity\ProjectRepository
+        factory_service: 'cerad_project__entity_manager__doctrine'
+        factory_method:  'getRepository'
+        arguments:  
+            - 'Cerad\Bundle\ProjectBundle\Entity\Project'
+        
+    cerad_project__project_repository:
+        alias: cerad_project__project_repository__doctrine
+
+    cerad_project__project_meta_repository:
         class:  Cerad\Bundle\ProjectBundle\EntityRepository\ProjectMetaRepository
         arguments:  
             - '%cerad_project__project_files%'

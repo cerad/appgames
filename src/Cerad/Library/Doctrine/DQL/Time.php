@@ -11,7 +11,7 @@
 * to kontakt@beberlei.de so I can send you a copy immediately.
 */
 
-namespace Cerad\Bundle\GameBundle\Doctrine\DQL;
+namespace Cerad\Library\Doctrine\DQL;
 
 use Doctrine\ORM\Query\Lexer;
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;

@@ -1,3 +1,9 @@
+cerad_game__project_game_schedule__list:
+    pattern:  /project/{projectSlug}/game-schedule
+    defaults: 
+        _controller: CeradGameBundle:Project\GameSchedule\GameScheduleList:list
+        _template: '@CeradGame\Game\Schedule\GameScheduleIndex.html.twig'
+
 cerad_game_schedule:
     pattern:  /
     defaults: 

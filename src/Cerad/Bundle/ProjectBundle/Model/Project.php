@@ -24,6 +24,9 @@ class Project
     public function getName() { return $this->name; }
     public function getRole() { return $this->role; }
     
+    public function getSlug1() { return $this->slug1; }
+    public function getSlug2() { return $this->slug2; }
+    
     public function getSeason()    { return $this->season;  }
     public function getStatus()    { return $this->status;  }
     
@@ -34,6 +37,9 @@ class Project
     public function setKey      ($value) { $this->key    = $value; }
     public function setName     ($value) { $this->name   = $value; }
     public function setRole     ($value) { $this->role   = $value; }
+    public function setSlug1    ($value) { $this->slug2  = $value; }
+    public function setSlug2    ($value) { $this->slug2  = $value; }
+    
     public function setSeason   ($value) { $this->season = $value; }
     public function setStatus   ($value) { $this->status = $value; }
     
@@ -41,8 +47,33 @@ class Project
     public function setDomain   ($value) { $this->domain    = $value; }
     public function setDomainSub($value) { $this->domainSub = $value; }
     
-    /* =========================================
-     * Debugging
+    public function __construct($meta = null)
+    {
+        $this->setMeta($meta);
+    }
+    /* ==================================================
+     * Set all the info variables as top level properties
+     * Make the remaining variables property arrays
+     * 
+     * Later might need to do a merge with existing data
+     * But it's fine this way for now
      */
+    public function setMeta($meta = null)
+    {
+        if (!$meta) return;
+        
+        $info = $meta['info'];
+        foreach($info as $key => $value)
+        {
+            $this->$key = $value;
+        }
+        foreach($meta as $key => $value)
+        {
+            if ($key != 'info')
+            {
+                $this->$key = $value;
+            }
+        }
+    }
 }
 ?>
