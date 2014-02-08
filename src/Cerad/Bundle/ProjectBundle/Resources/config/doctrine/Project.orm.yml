@@ -1,0 +1,62 @@
+Cerad\Bundle\ProjectBundle\Entity\Project:
+    type:  entity
+    table: projects
+    repositoryClass: Cerad\Bundle\ProjectBundle\EntityRepository\ProjectRepository
+    
+    indexes:
+       project_season_index:
+           columns: season
+       project_sport_index:
+           columns: sport
+       project_domain_index:
+           columns: domain
+       project_domain_sub_index:
+           columns: domainSub
+        
+    id:
+        id:
+            type: integer
+            generator: { strategy: AUTO }
+    
+    fields:
+        key:
+            column: keyx
+            type:   string
+            length: 80
+            unique: true
+            
+        name:
+            column:   name
+            type:     string
+            length:   80
+            nullable: true
+            
+        season:
+            column:   season
+            type:     string
+            length:   20
+            nullable: false
+            
+        sport:
+            column:   sport
+            type:     string
+            length:   20
+            nullable: false
+            
+        domain:
+            column:   domain
+            type:     string
+            length:   20
+            nullable: false
+            
+        domainSub:
+            column:   domainSub
+            type:     string
+            length:   40
+            nullable: false
+            
+        status:
+            column:   status
+            type:     string
+            length:   20
+            nullable: true

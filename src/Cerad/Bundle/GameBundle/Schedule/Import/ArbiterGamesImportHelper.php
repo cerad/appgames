@@ -32,7 +32,7 @@ class ArbiterGamesImportHelper
         if (isset($this->prepared[$key])) return $this->prepared[$key];
         
         $sql = <<<EOT
-SELECT id FROM projects WHERE id = :key;
+SELECT keyx FROM projects WHERE keyx = :key;
 EOT;
         return $this->prepared[$key] = $this->conn->prepare($sql);
     }
@@ -44,8 +44,8 @@ EOT;
 
         $sql = <<<EOT
 INSERT INTO projects
-       ( id,  season, sport, domain, domainSub, status)
-VALUES (:key,:season,:sport,:domain,:domainSub, 'Active')
+       ( keyx, season, sport, domain, domainSub, status)
+VALUES (:key, :season,:sport,:domain,:domainSub, 'Active')
 ;
 EOT;
         return $this->prepared[$key] = $this->conn->prepare($sql);

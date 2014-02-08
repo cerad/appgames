@@ -1,0 +1,148 @@
+
+USSF_AL_HFC_Classic: # Index is not used
+    
+  info:     
+    key: ALYS_SOCCER_HFCCLASSIC_SPRING2013
+                
+    slug1: classic     # Unique Active
+    slug2: classic2013 # Unique
+                  
+    fed:     USSF
+    fedOrg:  USSF_AL
+    fedRole: USSFC
+           
+    title:   "HFC Classic 2013"
+    desc:    "USSF HFC Classic 2013 - Huntsville, Alabama - April 19,20,21"
+    
+    general_url:  'http://www.huntsvillefc.org/springclassic/'
+    register_url: 'http://zayso.org/arbiter/tourn/classic'
+    
+    status:    Active
+    verified:  Yes
+                
+    sport:     Soccer
+    season:    Spring2013
+
+    domain:    ALYS
+    domainSub: HFC Classic
+                                
+    submit:  "Emails your application to Art Hundiak and yourself."
+    prefix:   Classic
+             
+    assignor:
+      name:  "Art Hundiak"
+      email: "ahundiak@gmail.com"
+      phone:  256.457.5943
+  
+    role:    tournament
+    dates:   ['2013-04-19',''2013-04-20','2013-04-21']
+    
+    levels:
+      - { key: 'U09 Boys A',      age: U09, gender: B, x: A      }
+      - { key: 'U09 Boys B',      age: U09, gender: B, x: B      }
+      - { key: 'U11 Boys Gold',   age: U11, gender: B, x: Gold   }
+      - { key: 'U11 Boys Silver', age: U11, gender: B, x: Silver }
+      - { key: 'U12 Boys',        age: U12, gender: B, x:        }
+      - { key: 'U14 Boys',        age: U14, gender: B, x:        }
+      
+      - { key: 'U09 Girls',   age: U09, gender: G, x:   }
+      - { key: 'U10 Girls A', age: U10, gender: G, x: A }
+      - { key: 'U10 Girls B', age: U10, gender: G, x: B }
+      
+      - { key: 'U11 Girls',   age: U11, gender: G, x:   }
+      - { key: 'U11 Girls A', age: U11, gender: G, x: A }
+      - { key: 'U11 Girls B', age: U11, gender: G, x: B }
+      
+      - { key: 'U13 Girls',   age: U13, gender: G, x:   }
+      - { key: 'U13 Girls A', age: U13, gender: G, x: A }
+      - { key: 'U13 Girls B', age: U13, gender: G, x: B }
+     
+  searches:    
+    dates:
+      type:     checkbox
+      label:    Days
+      default: '2013-04-19'
+      choices:
+        '2013-04-19': Fri
+        '2013-04-20': Sat
+        '2013-04-21': Sun
+    
+  plan:
+    refereeLevel:
+      type:    select
+      label:   Level to Referee At
+      default: Competitive
+      choices: { Competitive: Competitive, Elite: Elite, Recreational: Recreational }
+                                                
+    comfortLevelCenter:
+      type:    select
+      label:   Comfort Level To Center
+      default: U10
+      choices: { U10: U10, U12: U12, U14: U14, U16: U16, U19: U19 }
+                        
+    comfortLevelAssist:
+      type:    select
+      label:   Comfort Level To Assist
+      default: U10
+      choices: { U10: U10, U12: U12, U14: U14, U16: U16, U19: U19 }
+                        
+    requestAssessment:
+      type:      radio
+      label:     Assessment Request
+      choices:  {None: None, Informal: Informal, Formal: Formal}
+      default:   None
+
+    lodgingNights:
+      type: collection
+      items:
+        Fri:
+          type:      radio
+          label:     Lodging Friday Night
+          date:     '2014-04-04'
+          choices:  {No: No, Yes: Yes}
+          default:   No
+        Sat:
+          type:      radio
+          label:     Lodging Saturday Night
+          date:     '2014-04-05'
+          choices:  {No: No, Yes: Yes}
+          default:   No
+                            
+    lodgingWith:   { type: text, label: Lodging With,   size: 30 }
+    travelingWith: { type: text, label: Traveling With, size: 30 }
+    travelingFrom: { type: text, label: Traveling From, size: 30 }
+                    
+    teamClubAffilation:
+      type:    select
+      label:   Team/Club Affiliation
+      default: None
+      choices: 
+        None: None
+        Yes1: Club/Team is     in this tournament
+        Yes2: Club/Team is NOT in this tournament
+                        
+    teamClubName: { type: text, label: Team/Club Name, size: 30 }
+                             
+    availabilityDays:
+      type: collection
+      items:
+        Fri:
+          type:      select
+          label:     Availability Friday
+          date:     '2014-04-04'
+          default:   None
+          choices: { None: None, Evening: Kickoff 5PM, NotSure: Not Sure }
+        Sat:
+          type:      select
+          label:     Availability Saturday
+          date:     '2014-04-05'
+          default:   None
+          choices: { None: None, AllDay: All Day, MorningOnly: Morning Only, AfternoonOnly: Afternoon Only, NotSure: Not Sure }
+        Sun:
+          type:      select
+          label:     Availability Sunday
+          date:     '2014-04-06'
+          default:   None
+          choices: { None: None,AllDay: All Day, MorningOnly: Morning Only, AfternoonOnly: Afternoon Only, NotSure: Not Sure }
+                            
+    notes: { type: textarea, label: Notes, rows: 5, cols: 50}
