@@ -1,7 +1,8 @@
 
-USSF_AL_HFC_Classic: # Index is not used
-    
-  info:     
+# USSF_AL_HFC_Classic: Only one project per file
+# Tempting to move info items to the top level
+meta:
+  info:
     key: ALYS_SOCCER_HFCCLASSIC_SPRING2013
                 
     slug1: classic     # Unique Active
@@ -35,29 +36,29 @@ USSF_AL_HFC_Classic: # Index is not used
       phone:  256.457.5943
   
     role:    tournament
-    dates:   ['2013-04-19',''2013-04-20','2013-04-21']
+    dates:   ['2013-04-19','2013-04-20','2013-04-21']
     
     levels:
       - { key: 'U09 Boys A',      age: U09, gender: B, x: A      }
       - { key: 'U09 Boys B',      age: U09, gender: B, x: B      }
       - { key: 'U11 Boys Gold',   age: U11, gender: B, x: Gold   }
       - { key: 'U11 Boys Silver', age: U11, gender: B, x: Silver }
-      - { key: 'U12 Boys',        age: U12, gender: B, x:        }
-      - { key: 'U14 Boys',        age: U14, gender: B, x:        }
+      - { key: 'U12 Boys',        age: U12, gender: B, x: null   }
+      - { key: 'U14 Boys',        age: U14, gender: B, x: null   }
       
-      - { key: 'U09 Girls',   age: U09, gender: G, x:   }
-      - { key: 'U10 Girls A', age: U10, gender: G, x: A }
-      - { key: 'U10 Girls B', age: U10, gender: G, x: B }
+      - { key: 'U09 Girls',   age: U09, gender: G, x: null }
+      - { key: 'U10 Girls A', age: U10, gender: G, x: A    }
+      - { key: 'U10 Girls B', age: U10, gender: G, x: B    }
       
-      - { key: 'U11 Girls',   age: U11, gender: G, x:   }
-      - { key: 'U11 Girls A', age: U11, gender: G, x: A }
-      - { key: 'U11 Girls B', age: U11, gender: G, x: B }
+      - { key: 'U11 Girls',   age: U11, gender: G, x: null }
+      - { key: 'U11 Girls A', age: U11, gender: G, x: A    }
+      - { key: 'U11 Girls B', age: U11, gender: G, x: B    }
       
-      - { key: 'U13 Girls',   age: U13, gender: G, x:   }
-      - { key: 'U13 Girls A', age: U13, gender: G, x: A }
-      - { key: 'U13 Girls B', age: U13, gender: G, x: B }
+      - { key: 'U13 Girls',   age: U13, gender: G, x: null }
+      - { key: 'U13 Girls A', age: U13, gender: G, x: A    }
+      - { key: 'U13 Girls B', age: U13, gender: G, x: B    }
      
-  searches:    
+  search:    
     dates:
       type:     checkbox
       label:    Days

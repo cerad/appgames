@@ -1,7 +1,8 @@
 parameters:
-#    cerad_project.example.class: Cerad\Bundle\ProjectBundle\Example
 
 services:
-#    cerad_project.example:
-#        class: %cerad_project.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+      cerad_project__project_meta_repository:
+        class:  Cerad\Bundle\ProjectBundle\EntityRepository\ProjectMetaRepository
+        arguments:  
+            - '%cerad_project__project_files%'
+
