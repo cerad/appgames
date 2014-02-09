@@ -4,7 +4,8 @@
 meta:
   info:
     key: ALYS_SOCCER_HFCCLASSIC_SPRING2013
-                
+    
+    slug:  classic2013 # Prefix must be unique among active projects
     slug1: classic     # Unique Active
     slug2: classic2013 # Unique
                   

@@ -45,8 +45,8 @@ class GameScheduleListController extends Controller
         // Build the search parameter information
         $model = array();
         
-        $projectSlug = $request->attributes->get('projectSlug');
-        die($projectSlug);
+        $project = $request->attributes->get('project');
+        die($project->getKey());
         
         $model['domains']    = array('NASOA','ALYS');
         $model['domainSubs'] = array();

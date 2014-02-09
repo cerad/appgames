@@ -26,6 +26,10 @@ class ProjectMetaRepository
     {
         return isset($this->projects[$key]) ? $this->projects[$key] : null;
     }
+    public function findOneByKey($key)
+    {
+        return isset($this->projects[$key]) ? $this->projects[$key] : null;
+    }
     public function findAll()
     {
         return $this->projects;    
@@ -39,17 +43,20 @@ class ProjectMetaRepository
         }
         return $projects;
     }
-    public function findBySlug($slug)
+    public function findOneBySlug($slug)
     {
-        $slug = strtolower($slug);
+        $slug = trim(strtolower($slug));
+        if (!$slug) return null;
         
         foreach($this->projects as $project)
         {
-            if ($slug == strtolower($project->getSlug2())) return $project;
+            $slugx = strtolower($project->getSlug());
+            
+            if ($slug == $slugx) return $project;
             
             if ($project->getStatus() != 'Active') break;
-            
-            if ($slug == strtolower($project->getSlug1())) return $project;
+
+            if ($slug == substr($slugx,0,strlen($slug))) return $project;
         }
         return null;
     }

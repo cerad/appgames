@@ -9,6 +9,7 @@ class Project
     protected $key;
     protected $name;
     protected $role;   // Tournament, Season
+    protected $slug;
     protected $slug1;  // If active
     protected $slug2;  // If not active
     
@@ -23,9 +24,7 @@ class Project
     public function getKey()  { return $this->key;  }
     public function getName() { return $this->name; }
     public function getRole() { return $this->role; }
-    
-    public function getSlug1() { return $this->slug1; }
-    public function getSlug2() { return $this->slug2; }
+    public function getSlug() { return $this->slug; }
     
     public function getSeason()    { return $this->season;  }
     public function getStatus()    { return $this->status;  }
@@ -37,8 +36,7 @@ class Project
     public function setKey      ($value) { $this->key    = $value; }
     public function setName     ($value) { $this->name   = $value; }
     public function setRole     ($value) { $this->role   = $value; }
-    public function setSlug1    ($value) { $this->slug2  = $value; }
-    public function setSlug2    ($value) { $this->slug2  = $value; }
+    public function setSlug     ($value) { $this->slug   = $value; }
     
     public function setSeason   ($value) { $this->season = $value; }
     public function setStatus   ($value) { $this->status = $value; }
@@ -63,16 +61,10 @@ class Project
         if (!$meta) return;
         
         $info = $meta['info'];
-        foreach($info as $key => $value)
-        {
-            $this->$key = $value;
-        }
+        foreach($info as $key => $value) { $this->$key = $value; }
         foreach($meta as $key => $value)
         {
-            if ($key != 'info')
-            {
-                $this->$key = $value;
-            }
+            if ($key != 'info') { $this->$key = $value; }
         }
     }
 }
