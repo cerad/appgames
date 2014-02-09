@@ -9,6 +9,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 //  Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Cerad\Bundle\ProjectBundle\ProjectEvents;
 
@@ -42,8 +43,7 @@ class ProjectEventListener extends ContainerAware implements EventSubscriberInte
             $request->attributes->set('project',$project);
             return;
         }
-        // TODO: deal with invalid project request
-        die('requested ' . $projectSlug);
+        throw new NotFoundHttpException(sprintf('Project %s not found',$projectSlug));
     }
     public function onFindProjectBySlug(Event $event)
     {

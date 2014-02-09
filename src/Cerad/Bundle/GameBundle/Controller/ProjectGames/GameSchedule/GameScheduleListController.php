@@ -1,5 +1,5 @@
 <?php
-namespace Cerad\Bundle\GameBundle\Controller\Project\GameSchedule;
+namespace Cerad\Bundle\GameBundle\Controller\ProjectGames\GameSchedule;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -7,13 +7,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class GameScheduleListController extends Controller
 {
-    const SessionSearch = 'ProjectGameScheduleSearch';
+    const SessionSearch = 'ProjectGamesGameScheduleSearch';
     
-    public function listAction(Request $request)
+    public function listAction(Request $request, GameScheduleListModel $model)
     {
-        // The search model
-        $model = $this->createModel($request);
-        
+/*        
         // The form stuff
         $searchFormType = $this->get('cerad_game.game_schedule_search.form_type');
         $searchForm = $this->createForm($searchFormType,$model);
@@ -28,16 +26,15 @@ class GameScheduleListController extends Controller
             
             return $this->redirect($this->generateUrl('cerad_game_schedule'));
         }
-
+*/
         // Query for the games
         $gameRepo = $this->get('cerad_game.game_repository');
-        $games = $gameRepo->queryGameSchedule($model);
+        $games = $gameRepo->queryGameSchedule($model->criteria);
         
         // And render
         $tplData = array();
-        $tplData['searchForm'] = $searchForm->createView();
-        $tplData['games']   = $games;
-        $tplData['isAdmin'] = false;
+      //$tplData['searchForm'] = $searchForm->createView();
+        $tplData['games'] = $games;
         return $this->render($request->get('_template'),$tplData);
     }
     public function createModel(Request $request)
@@ -45,32 +42,24 @@ class GameScheduleListController extends Controller
         // Build the search parameter information
         $model = array();
         
-        $project = $request->attributes->get('project');
-        die($project->getKey());
+        $model['project'] = $project = $request->attributes->get('project');
         
-        $model['domains']    = array('NASOA','ALYS');
-        $model['domainSubs'] = array();
+        $criteria = array();
         
-        $model['levels']  = array();
-        $model['teams' ]  = array();
-        $model['fields']  = array();
+        $criteria['projectKeys'] = array($project->getKey());
         
-        $model['seasons']  = array('Spring2014');
-        $model['sports']   = array('Soccer');
-        $model['statuses'] = array();
+        $criteria['levels']  = array();
+        $criteria['teams' ]  = array();
+        $criteria['fields']  = array();
         
-        $date1 = new \DateTime();
-        $date2 = clone $date1;
-        $date2->add(new \DateInterval('P2D'));
+        $projectRole = $project->getRole();
+        if ($projectRole == 'tournament')
+        {
+          //$criteria['dates'] = $project->getDates();
+        }
+        $model['criteria'] = $criteria;
         
-        $model['date1'] = $date1->format('Y-m-d');
-        $model['date2'] = $date2->format('Y-m-d');
-        
-        $model['date1On'] = false;
-        $model['date2On'] = false;
-        
-        $model['date1Ignore'] = false;
-        $model['date2Ignore'] = false;
+        return $model;
         
         // Merge form session
         $session = $request->getSession();

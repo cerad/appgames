@@ -70,7 +70,7 @@ services:
             - '@cerad_level.level_repository'
         tags:
             - { name: twig.extension }
-            
+
     cerad_game.game_schedule_search.form_type:
         class: Cerad\Bundle\GameBundle\FormType\GameScheduleSearchFormType
         arguments: 
@@ -79,4 +79,24 @@ services:
             - '@cerad_game.game_repository'
         tags:
             - { name: form.type, alias: game_schedule_search }
+            
+# ==========================================================
+# This should be in app bundle or maybe a misc bundle
+    cerad_app__model_event_listener:
+        class: Cerad\Library\Symfony\EventListener\ModelEventListener
+        calls:
+             - [setContainer, ['@service_container']]
+        tags:
+            - { name: kernel.event_subscriber }
+ 
+# ==========================================================
+# Action stuff
+    cerad_game__project_games__game_schedule_list_controller:
+        class: Cerad\Bundle\GameBundle\Controller\ProjectGames\GameSchedule\GameScheduleListController
+        calls:
+             - [setContainer, ['@service_container']]
+             
+    cerad_game__project_games__game_schedule_list_model:
+        class: Cerad\Bundle\GameBundle\Controller\ProjectGames\GameSchedule\GameScheduleListModel
+
             

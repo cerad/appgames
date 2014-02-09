@@ -28,7 +28,7 @@ class GameRepository extends AbstractRepository
         
         $teamNames  = $this->getArrayValue($criteria,'teams');
         $fieldNames = $this->getArrayValue($criteria,'fields');
-    
+       
         /* =================================================
          * Dates are always so much fun
          */
@@ -115,7 +115,7 @@ class GameRepository extends AbstractRepository
         }
       //echo $qb->getDql();
         $gameIds = $qb->getQuery()->getScalarResult();
-        
+   
         if (count($gameIds) < 1) return array();
         
         $ids = array();

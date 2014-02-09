@@ -10,8 +10,8 @@ class Project
     protected $name;
     protected $role;   // Tournament, Season
     protected $slug;
-    protected $slug1;  // If active
-    protected $slug2;  // If not active
+    
+    protected $dates;
     
     protected $status = 'Active';
      
@@ -25,6 +25,8 @@ class Project
     public function getName() { return $this->name; }
     public function getRole() { return $this->role; }
     public function getSlug() { return $this->slug; }
+    
+    public function getDates() { return $this->dates; }
     
     public function getSeason()    { return $this->season;  }
     public function getStatus()    { return $this->status;  }
