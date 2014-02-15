@@ -79,15 +79,6 @@ services:
             - '@cerad_game.game_repository'
         tags:
             - { name: form.type, alias: game_schedule_search }
-            
-# ==========================================================
-# This should be in app bundle or maybe a misc bundle
-    cerad_app__model_event_listener:
-        class: Cerad\Library\Symfony\EventListener\ModelEventListener
-        calls:
-             - [setContainer, ['@service_container']]
-        tags:
-            - { name: kernel.event_subscriber }
  
 # ==========================================================
 # Action stuff
