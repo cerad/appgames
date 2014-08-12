@@ -453,18 +453,21 @@ class ArbiterGamesWithSlotsImportPDO
         $officials = array();
         for($slot = 1; $slot <= 5; $slot++)
         {
-            $roleIndex = 'officialRole' . $slot;
-            $nameIndex = 'officialName' . $slot;
+            $roleIndex  = 'officialRole'  . $slot;
+            $nameIndex  = 'officialName'  . $slot;
+            $emailIndex = 'officialEmail' . $slot;
             
             if ($row[$roleIndex] != $noRoles[$slot])
             {
-                $name = $row[$nameIndex] != 'Empty' ? $row[$nameIndex] : null;
+                $name  = $row[$nameIndex ] != 'Empty' ? $row[$nameIndex ] : null;
+                $email = $row[$emailIndex] != 'Empty' ? $row[$emailIndex] : null;
                 
                 $officials[$slot] = array
                 (
                     'slot'  => $slot,
                     'role'  => $row[$roleIndex],
                     'name'  => $name,
+                    'email' => $email,
                     'assignState' => null,
                 );
            }
@@ -502,11 +505,15 @@ class ArbiterGamesWithSlotsImportPDO
         }
         // Verify report type
         $reportType = $reader->getAttribute('Name');
-        if ($reportType != 'Games with Slots')
+        switch($reportType)
         {
-            $results->message = '*** Unexpected report type: ' . $reportType;
-            $reader->close();
-            return $results;
+            case 'Games with Slots': // Pre Fall 2014
+            case 'Games_with_Slots_1':
+                break;
+            default:
+                $results->message = '*** Unexpected report type: ' . $reportType;
+                $reader->close();
+                return $results;
         }
         // Kind of screw but oh well
         while ($reader->read() && $reader->name !== 'Detail');
@@ -570,6 +577,12 @@ class ArbiterGamesWithSlotsImportPDO
         'officialName3' => 'Third_Official', 
         'officialName4' => 'Fourth_Official',  // 'Empty'
         'officialName5' => 'Fifth_Official',   // 'Empty'
+        
+        'officialEmail1' => 'First_Email', 
+        'officialEmail2' => 'Second_Email', 
+        'officialEmail3' => 'Third_Email', 
+        'officialEmail4' => 'Fourth_Email',  // 'Empty'
+        'officialEmail5' => 'Fifth_Email',   // 'Empty'
         
         'billTo'        => 'BillTo_Name',
         'billAmount'    => 'Bill_Amount',     // 100.00

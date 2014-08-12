@@ -23,7 +23,7 @@ class GameOfficial
     protected $personEmail;
     protected $personPhone;
     protected $personBadge;
-    protected $personGuid;
+    protected $personKey;
     protected $personFedKey;
     protected $personOrgKey;
     
@@ -45,7 +45,7 @@ class GameOfficial
     public function getPersonEmail    () { return $this->personEmail;     }
     public function getPersonPhone    () { return $this->personPhone;     }
     public function getPersonBadge    () { return $this->personBadge;     }
-    public function getPersonGuid     () { return $this->personGuid;      }
+    public function getPersonKey      () { return $this->personKey;       }
     
     public function getReport()          { return $this->report;          }
     public function getStatus()          { return $this->status;          }
@@ -63,7 +63,7 @@ class GameOfficial
     public function setPersonEmail    ($value) { $this->personEmail     = $value; }
     public function setPersonPhone    ($value) { $this->personPhone     = $value; }
     public function setPersonBadge    ($value) { $this->personBadge     = $value; }
-    public function setPersonGuid     ($value) { $this->personGuid      = $value; }
+    public function setPersonKey      ($value) { $this->personKey       = $value; }
     public function setPersonFedKey   ($value) { $this->personFedKey    = $value; }
     public function setPersonOrgKey   ($value) { $this->personOrgKey    = $value; }
     

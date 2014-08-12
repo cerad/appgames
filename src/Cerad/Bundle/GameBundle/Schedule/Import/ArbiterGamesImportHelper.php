@@ -241,6 +241,7 @@ SELECT
     official.slot           AS slot,
     official.role           AS role,
     official.assignState    AS assignState,
+    official.personEmail    AS email,
     official.personNameFull AS name
 FROM  
     game_officials AS official
@@ -261,6 +262,7 @@ UPDATE game_officials SET
     slot           = :slot,
     role           = :role,
     assignState    = :assignState,
+    personEmail    = :email,
     personNameFull = :name
 WHERE id = :id
 ;
@@ -275,8 +277,8 @@ EOT;
                 
         $sql = <<<EOT
 INSERT INTO game_officials
-      ( gameId, slot, role, assignState, personNameFull)
-VALUES(:gameId,:slot,:role,:assignState,:name)
+      ( gameId, slot, role, assignState, personEmail, personNameFull)
+VALUES(:gameId,:slot,:role,:assignState,:email,      :name)
 ;
 EOT;
         return $this->prepared[$key] = $this->conn->prepare($sql);

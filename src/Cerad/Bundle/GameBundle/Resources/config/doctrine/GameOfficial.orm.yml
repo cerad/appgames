@@ -50,6 +50,18 @@ Cerad\Bundle\GameBundle\Entity\GameOfficial:
             type:     string
             length:   80
             nullable: true
+            
+        personEmail:
+            column:   personEmail
+            type:     string
+            length:   80
+            nullable: true
+            
+        personKey:
+            column:   personKey
+            type:     string
+            length:   80
+            nullable: true
                 
             
         status:
